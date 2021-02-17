@@ -43,8 +43,8 @@ class BelchertownInstaller(ExtensionInstaller):
 extension_config = """
 [StdReport]
 
-    [[Belchertown-dev-dev]]
-        skin = Belchertown-dev-dev
+    [[Belchertown-dev]]
+        skin = Belchertown-dev
         HTML_ROOT = belchertown-dev
         enable = true 
 
@@ -61,7 +61,7 @@ extension_config = """
            # logo_image_dark = ""
            # site_title = "My Weather Website"
            # station_observations = "barometer","dewpoint","outHumidity","rainWithRainRate"
-           # beaufort_categoty = 0
+           # beaufort_category = 0
            # manifest_name = "My Weather Website"
            # manifest_short_name = "MWW"
            # aeris_map = 0
@@ -162,71 +162,71 @@ config_dict = configobj.ConfigObj(StringIO(extension_config))
 files=[('bin/user', ['bin/user/belchertown-dev.py'
                     ]
         ),
-       ('skins/Belchertown-dev-dev', ['skins/Belchertown-dev-dev/favicon.ico',
-                              'skins/Belchertown-dev-dev/footer.html.tmpl',
-                              'skins/Belchertown-dev-dev/header.html.tmpl',
-                              'skins/Belchertown-dev-dev/index.html.tmpl',
-                              'skins/Belchertown-dev-dev/about.inc.example',
-                              'skins/Belchertown-dev-dev/celestial.inc',
-                              'skins/Belchertown-dev-dev/graphs.conf.example',
-                              'skins/Belchertown-dev-dev/page-header.inc',
-                              'skins/Belchertown-dev-dev/manifest.json.tmpl',
-                              'skins/Belchertown-dev-dev/records.inc.example',
-                              'skins/Belchertown-dev-dev/records-table.inc.example',
-                              'skins/Belchertown-dev-dev/robots.txt',
-                              'skins/Belchertown-dev-dev/skin.conf',
-                              'skins/Belchertown-dev-dev/belchertown-dark.min.css',
-                              'skins/Belchertown-dev-dev/style.css'
+       ('skins/Belchertown-dev', ['skins/Belchertown-dev/favicon.ico',
+                              'skins/Belchertown-dev/footer.html.tmpl',
+                              'skins/Belchertown-dev/header.html.tmpl',
+                              'skins/Belchertown-dev/index.html.tmpl',
+                              'skins/Belchertown-dev/about.inc.example',
+                              'skins/Belchertown-dev/celestial.inc',
+                              'skins/Belchertown-dev/graphs.conf.example',
+                              'skins/Belchertown-dev/page-header.inc',
+                              'skins/Belchertown-dev/manifest.json.tmpl',
+                              'skins/Belchertown-dev/records.inc.example',
+                              'skins/Belchertown-dev/records-table.inc.example',
+                              'skins/Belchertown-dev/robots.txt',
+                              'skins/Belchertown-dev/skin.conf',
+                              'skins/Belchertown-dev/belchertown-dark.min.css',
+                              'skins/Belchertown-dev/style.css'
                              ]
         ),
-       ('skins/Belchertown-dev-dev/about', ['skins/Belchertown-dev-dev/about/index.html.tmpl']),
-       ('skins/Belchertown-dev-dev/graphs', ['skins/Belchertown-dev-dev/graphs/index.html.tmpl']),
-       ('skins/Belchertown-dev-dev/NOAA', ['skins/Belchertown-dev-dev/NOAA/NOAA-YYYY-MM.txt.tmpl',
-                                   'skins/Belchertown-dev-dev/NOAA/NOAA-YYYY.txt.tmpl'
+       ('skins/Belchertown-dev/about', ['skins/Belchertown-dev/about/index.html.tmpl']),
+       ('skins/Belchertown-dev/graphs', ['skins/Belchertown-dev/graphs/index.html.tmpl']),
+       ('skins/Belchertown-dev/NOAA', ['skins/Belchertown-dev/NOAA/NOAA-YYYY-MM.txt.tmpl',
+                                   'skins/Belchertown-dev/NOAA/NOAA-YYYY.txt.tmpl'
                                   ]
         ),
-       ('skins/Belchertown-dev-dev/pi', ['skins/Belchertown-dev-dev/pi/index.html.tmpl']),
-       ('skins/Belchertown-dev-dev/records', ['skins/Belchertown-dev-dev/records/index.html.tmpl']),
-       ('skins/Belchertown-dev-dev/reports', ['skins/Belchertown-dev-dev/reports/index.html.tmpl']),
-       ('skins/Belchertown-dev-dev/js', ['skins/Belchertown-dev-dev/js/belchertown.js.tmpl',
-                                 'skins/Belchertown-dev-dev/js/index.html',
-                                 'skins/Belchertown-dev-dev/js/responsive-menu.js'
+       ('skins/Belchertown-dev/pi', ['skins/Belchertown-dev/pi/index.html.tmpl']),
+       ('skins/Belchertown-dev/records', ['skins/Belchertown-dev/records/index.html.tmpl']),
+       ('skins/Belchertown-dev/reports', ['skins/Belchertown-dev/reports/index.html.tmpl']),
+       ('skins/Belchertown-dev/js', ['skins/Belchertown-dev/js/belchertown.js.tmpl',
+                                 'skins/Belchertown-dev/js/index.html',
+                                 'skins/Belchertown-dev/js/responsive-menu.js'
                                 ]
         ),
-       ('skins/Belchertown-dev-dev/json', ['skins/Belchertown-dev-dev/json/index.html',
-                                   'skins/Belchertown-dev-dev/json/weewx_data.json.tmpl'
+       ('skins/Belchertown-dev/json', ['skins/Belchertown-dev/json/index.html',
+                                   'skins/Belchertown-dev/json/weewx_data.json.tmpl'
                                   ]
         ),
-       ('skins/Belchertown-dev-dev/images', ['skins/Belchertown-dev-dev/images/clear-day.png',
-                                     'skins/Belchertown-dev-dev/images/clear-night.png',
-                                     'skins/Belchertown-dev-dev/images/cloudy.png',
-                                     'skins/Belchertown-dev-dev/images/fog.png',
-                                     'skins/Belchertown-dev-dev/images/hail.png',
-                                     'skins/Belchertown-dev-dev/images/mostly-clear-day.png',
-                                     'skins/Belchertown-dev-dev/images/mostly-clear-night.png',
-                                     'skins/Belchertown-dev-dev/images/mostly-cloudy-day.png',
-                                     'skins/Belchertown-dev-dev/images/mostly-cloudy-night.png',
-                                     'skins/Belchertown-dev-dev/images/partly-cloudy-day.png',
-                                     'skins/Belchertown-dev-dev/images/partly-cloudy-night.png',
-                                     'skins/Belchertown-dev-dev/images/rain.png',
-                                     'skins/Belchertown-dev-dev/images/sleet.png',
-                                     'skins/Belchertown-dev-dev/images/snow.png',
-                                     'skins/Belchertown-dev-dev/images/snowflake-icon-15px.png',
-                                     'skins/Belchertown-dev-dev/images/station.png',
-                                     'skins/Belchertown-dev-dev/images/station48.png',
-                                     'skins/Belchertown-dev-dev/images/station72.png',
-                                     'skins/Belchertown-dev-dev/images/station96.png',
-                                     'skins/Belchertown-dev-dev/images/station144.png',
-                                     'skins/Belchertown-dev-dev/images/station168.png',
-                                     'skins/Belchertown-dev-dev/images/station192.png',
-                                     'skins/Belchertown-dev-dev/images/sunrise.png',
-                                     'skins/Belchertown-dev-dev/images/sunset.png',
-                                     'skins/Belchertown-dev-dev/images/thunderstorm.png',
-                                     'skins/Belchertown-dev-dev/images/tornado.png',
-                                     'skins/Belchertown-dev-dev/images/unknown.png',
-                                     'skins/Belchertown-dev-dev/images/wind.png',
-                                     'skins/Belchertown-dev-dev/images/windy.png',
-                                     'skins/Belchertown-dev-dev/images/index.html'
+       ('skins/Belchertown-dev/images', ['skins/Belchertown-dev/images/clear-day.png',
+                                     'skins/Belchertown-dev/images/clear-night.png',
+                                     'skins/Belchertown-dev/images/cloudy.png',
+                                     'skins/Belchertown-dev/images/fog.png',
+                                     'skins/Belchertown-dev/images/hail.png',
+                                     'skins/Belchertown-dev/images/mostly-clear-day.png',
+                                     'skins/Belchertown-dev/images/mostly-clear-night.png',
+                                     'skins/Belchertown-dev/images/mostly-cloudy-day.png',
+                                     'skins/Belchertown-dev/images/mostly-cloudy-night.png',
+                                     'skins/Belchertown-dev/images/partly-cloudy-day.png',
+                                     'skins/Belchertown-dev/images/partly-cloudy-night.png',
+                                     'skins/Belchertown-dev/images/rain.png',
+                                     'skins/Belchertown-dev/images/sleet.png',
+                                     'skins/Belchertown-dev/images/snow.png',
+                                     'skins/Belchertown-dev/images/snowflake-icon-15px.png',
+                                     'skins/Belchertown-dev/images/station.png',
+                                     'skins/Belchertown-dev/images/station48.png',
+                                     'skins/Belchertown-dev/images/station72.png',
+                                     'skins/Belchertown-dev/images/station96.png',
+                                     'skins/Belchertown-dev/images/station144.png',
+                                     'skins/Belchertown-dev/images/station168.png',
+                                     'skins/Belchertown-dev/images/station192.png',
+                                     'skins/Belchertown-dev/images/sunrise.png',
+                                     'skins/Belchertown-dev/images/sunset.png',
+                                     'skins/Belchertown-dev/images/thunderstorm.png',
+                                     'skins/Belchertown-dev/images/tornado.png',
+                                     'skins/Belchertown-dev/images/unknown.png',
+                                     'skins/Belchertown-dev/images/wind.png',
+                                     'skins/Belchertown-dev/images/windy.png',
+                                     'skins/Belchertown-dev/images/index.html'
                                     ]
         )
 ]
