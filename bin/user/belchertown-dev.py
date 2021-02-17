@@ -1,5 +1,5 @@
 """
-Extension for the Belchertown skin.
+Extension for the Belchertown-dev skin.
 This extension builds search list extensions as well
 as a crude "cron" to download necessary files.
 
@@ -58,7 +58,7 @@ if weewx.__version__ < "3.9":
 if weewx.__version__ < "4":
 
     def logmsg(level, msg):
-        syslog.syslog(level, "Belchertown Extension: %s" % msg)
+        syslog.syslog(level, "Belchertown-dev Extension: %s" % msg)
 
     def logdbg(msg):
         logmsg(syslog.LOG_DEBUG, msg)
@@ -235,7 +235,7 @@ class getData(SearchList):
 
     def get_extension_list(self, timespan, db_lookup):
         """
-        Build the data needed for the Belchertown skin
+        Build the data needed for the Belchertown-dev skin
         """
 
         global aqi
@@ -312,7 +312,7 @@ class getData(SearchList):
                     logerr(
                         "Locale: Error using locale %s. "
                         "This locale may not be installed on your system and you may see unexpected results. "
-                        "Belchertown skin JavaScript will try to use this locale. Full error: %s"
+                        "Belchertown-dev skin JavaScript will try to use this locale. Full error: %s"
                         % (
                             self.generator.skin_dict["Extras"]["belchertown_locale"],
                             error,
@@ -444,7 +444,7 @@ class getData(SearchList):
 
         # Set a default radar URL using station's lat/lon. Moved from skin.conf
         # so we can get station lat/lon from weewx.conf. A lot of stations out
-        # there with Belchertown 0.1 through 0.7 are showing the visitor's
+        # there with Belchertown-dev 0.1 through 0.7 are showing the visitor's
         # location and not the proper station location because nobody edited
         # the radar_html which did not have lat/lon set previously.
         lat = self.generator.config_dict["Station"]["latitude"]
@@ -1603,7 +1603,7 @@ class getData(SearchList):
             earthquake_maxradiuskm = self.generator.skin_dict["Extras"][
                 "earthquake_maxradiuskm"
             ]
-            # Sample URL from Belchertown Weather:
+            # Sample URL from Belchertown-dev Weather:
             # http://earthquake.usgs.gov/fdsnws/event/1/query?limit=1&lat=42.223&lon=-72.374&maxradiuskm=1000&format=geojson&nodata=204&minmag=2
             if self.generator.skin_dict["Extras"]["earthquake_server"] == "USGS":
                 earthquake_url = (
@@ -2823,7 +2823,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
         """
 
         if observation == "windRose":
-            # Special Belchertown wind rose with Highcharts aggregator Wind
+            # Special Belchertown-dev wind rose with Highcharts aggregator Wind
             # speeds are split into the first 7 beaufort groups.
             # https://en.wikipedia.org/wiki/Beaufort_scale
 
@@ -3203,7 +3203,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             series = [group_0, group_1, group_2, group_3, group_4, group_5, group_6]
             return series
 
-        # Special Belchertown Weather Range (radial)
+        # Special Belchertown-dev Weather Range (radial)
         # https://www.highcharts.com/blog/tutorials/209-the-art-of-the-chart-weather-radials/
         if observation == "weatherRange":
 
@@ -3359,7 +3359,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
 
             return data
 
-        # Special Belchertown Skin rain counter
+        # Special Belchertown-dev Skin rain counter
         if observation == "rainTotal":
             obs_lookup = "rain"
             # Force sum on this observation
