@@ -2329,7 +2329,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 chart_subtitle = plot_options.get("subtitle", "")
                 output[chart_group][plotname]["options"]["subtitle"] = chart_subtitle
 
-                # Get the type of plot ("bar', 'line', 'spline', or 'scatter')
+                # Get the type of plot ("bar', 'line', 'spline', 'bubble' or 'scatter')
                 plottype = plot_options.get("type", "line")
                 output[chart_group][plotname]["options"]["type"] = plottype
 
@@ -2600,7 +2600,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     if observation_type == "rainTotal":
                         obs_label = "rain"
                     elif (
-                            observation_type == "weatherRange"
+                            observation_type == "weatherRange" or "bubble"
                             and weatherRange_obs_lookup is not None
                     ):
                         obs_label = weatherRange_obs_lookup
@@ -3290,6 +3290,64 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 "range_unit": obs_unit,
                 "range_unit_label": obs_unit_label,
             }
+
+            return data
+
+            # Matt's Belchertown Bubble for Rain
+            # https://www.highcharts.com/demo/bubble
+            # https://www.visualisingdata.com/2014/02/weather-radials-new-project-from-raureif/
+        if observation == "bubble":
+
+            # Define what we are looking up
+            if weatherRange_obs_lookup is not None:
+                obs_lookup = weatherRange_obs_lookup
+            else:
+                raise Warning(
+                    "Error trying to create the bubblechart. You are missing the range_type configuration item.")
+
+            # Force 1 day if aggregate_interval. These charts are meant to show
+            # a column range for high, low and average for a full day.
+            if not aggregate_interval:
+                aggregate_interval = 86400
+
+            # Get sum values
+            aggregate_type = "sum"
+            try:
+                (time_start_vt, time_stop_vt, obs_vt) = archive.getSqlVectors(
+                    TimeSpan(start_ts, end_ts),
+                    obs_lookup,
+                    aggregate_type,
+                    aggregate_interval
+                )
+            except Exception as e:
+                raise Warning("Error trying to use database binding %s to graph observation %s. Error was: %s." % (
+                    binding, obs_lookup, e))
+
+            sum_obs_vt = self.converter.convert(obs_vt)
+
+            # Get avg values
+            aggregate_type = "avg"
+            try:
+                (time_start_vt, time_stop_vt, obs_vt) = archive.getSqlVectors(
+                    TimeSpan(start_ts, end_ts),
+                    "outTemp",
+                    aggregate_type,
+                    aggregate_interval
+                )
+            except Exception as e:
+                raise Warning("Error trying to use database binding %s to graph observation %s. Error was: %s." % (
+                    binding, obs_lookup, e))
+
+            avg_obs_vt = self.converter.convert(obs_vt)
+
+            obs_unit = avg_obs_vt[1]
+            obs_unit_label = self.skin_dict['Units']['Labels'].get(obs_unit, "")
+
+            # Convert to millis and zip all together
+            time_ms = [float(x) * 1000 for x in time_start_vt[0]]
+            output_data = zip(time_ms, avg_obs_vt[0], sum_obs_vt[0])
+
+            data = {"bubble": True, "obsdata": output_data, "range_unit": obs_unit, "range_unit_label": obs_unit_label}
 
             return data
 
