@@ -2089,6 +2089,12 @@ function showChart(json_file, prepend_renderTo=false) {
                             radius: 2
                         },
                     },
+                    bubble: {
+                        minSize: 0,
+                        maxSize: "50",
+			            marker: {fillOpacity: 0.1},
+			            keys: ['x', 'y', 'z']
+                    },
                 },
                 
                 // Highstock is needed for gapsize. Disable these 3 to make it look like standard Highcharts
@@ -2110,34 +2116,46 @@ function showChart(json_file, prepend_renderTo=false) {
                     },
                     // For locale control with moment.js
                     formatter: function (tooltip) {
-                                    try {
-                                        // The first returned item is the header, subsequent items are the points.
-                                        // Mostly applies to line style charts (line, spline, area)
-                                        return [moment.unix( this.x / 1000).utcOffset($moment_js_utc_offset).format( tooltip_date_format )].concat(
-                                            this.points.map(function (point) {
-                                                // If observation_type is in the series array, use that otherwise use the obsType
-                                                var point_obsType = point.series.userOptions.observation_type ? point.series.userOptions.observation_type : point.series.userOptions.obsType;
-                                                var rounding = point.series.userOptions.rounding;
-                                                var mirrored = point.series.userOptions.mirrored_value;
-                                                var numberFormat = point.series.userOptions.numberFormat ? point.series.userOptions.numberFormat : "";
-                                                return "<span style='color:" + point.series.color + "'>\u25CF</span> " + point.series.name + ': ' + highcharts_tooltip_factory( point.y, point_obsType, true, rounding, mirrored, numberFormat );
-                                            })
-                                        );
-                                    } catch(e) {
-                                        // There's an error so check if it's windDir to apply wind direction label, or if it's a scatter. If none of those revert back to default tooltip.
-                                        if (this.series.userOptions.obsType == "windDir" || this.series.userOptions.observation_type == "windDir") {
-                                            // If observation_type is in the series array, use that otherwise use the obsType
-                                            var point_obsType = this.series.userOptions.observation_type ? this.series.userOptions.observation_type : this.series.userOptions.obsType;
-                                            var rounding = this.series.userOptions.rounding;
-                                            var mirrored = this.series.userOptions.mirrored_value;
-                                            return moment.unix( this.x / 1000).utcOffset($moment_js_utc_offset).format( tooltip_date_format ) +'<br><b>' + highcharts_tooltip_factory( this.point.y, point_obsType, true, rounding, mirrored );
-                                        } else if (this.series.userOptions.type == "scatter") {
-                                            // Catch anything else that might be a scatter plot. Scatter plots will just show x,y coordinates without this.
-                                            return "<span style='color:" + this.series.color + "'>\u25CF</span> " + this.series.name + ': ' + Highcharts.numberFormat(this.y);
+                        try {
+                            // The first returned item is the header, subsequent items are the points.
+                            // Mostly applies to line style charts (line, spline, area)
+                            return [moment.unix( this.x / 1000).utcOffset($moment_js_utc_offset).format( tooltip_date_format )].concat(
+                                this.points.map(function (point) {
+                                    // If observation_type is in the series array, use that otherwise use the obsType
+                                    var point_obsType = point.series.userOptions.observation_type ? point.series.userOptions.observation_type : point.series.userOptions.obsType;
+                                    var rounding = point.series.userOptions.rounding;
+                                    var mirrored = point.series.userOptions.mirrored_value;
+                                    var numberFormat = point.series.userOptions.numberFormat ? point.series.userOptions.numberFormat : "";
+                                        if (point.series.name == "Sunshine" && point.series.type == 'line'){
+                                            var value = point.y == 0 ? 'No': 'Yes';
+                                            return "<span style='color:" + point.series.color + "'>\u25CF</span> " + point.series.name + ': ' + value;
+                                        belchertown_debug("point type is" +point.series.type);
                                         } else {
-                                            return tooltip.defaultFormatter.call(this, tooltip);
+                                            return "<span style='color:" + point.series.color + "'>\u25CF</span> " + point.series.name + ': ' + highcharts_tooltip_factory( point.y, point_obsType, true, rounding, mirrored, numberFormat );
                                         }
-                                    }
+                                })
+                            );
+                        } catch(e) {
+                            // There's an error so check if it's windDir to apply wind direction label, or if it's a scatter. If none of those revert back to default tooltip.
+                            if (this.series.userOptions.obsType == "windDir" || this.series.userOptions.observation_type == "windDir") {
+                                // If observation_type is in the series array, use that otherwise use the obsType
+                                var point_obsType = this.series.userOptions.observation_type ? this.series.userOptions.observation_type : this.series.userOptions.obsType;
+                                var rounding = this.series.userOptions.rounding;
+                                var mirrored = this.series.userOptions.mirrored_value;
+                                return moment.unix( this.x / 1000).utcOffset($moment_js_utc_offset).format( tooltip_date_format ) +'<br><b>' + highcharts_tooltip_factory( this.point.y, point_obsType, true, rounding, mirrored );
+                            } else if (this.series.userOptions.type == "scatter") {
+                                // Catch anything else that might be a scatter plot. Scatter plots will just show x,y coordinates without this.
+                                return "<span style='color:" + this.series.color + "'>\u25CF</span> " + this.series.name + ': ' + Highcharts.numberFormat(this.y);
+                            } else if (this.series.userOptions.type == "bubble") {
+                                belchertown_debug('tooltip: x=' + this.x + 'y = ' + this.y + 'z = ' + this.z);
+                                return [moment.unix( this.x / 1000).utcOffset($moment_js_utc_offset).format( tooltip_date_format )].concat(
+                                    // Catch anything else that might be a bubble plot. Bubble plots will just show x,y coordinates without this.
+                                    "<span style='color:" + this.series.color + "'>\u25CF</span> " + this.series.name + ': ' + Highcharts.numberFormat(this.series.data[0][2])
+                                )
+                            } else {
+                                return tooltip.defaultFormatter.call(this, tooltip);
+                            }
+                        }
                     },
                     split: true,
                 },
@@ -2316,7 +2334,14 @@ function showChart(json_file, prepend_renderTo=false) {
                     options.plotOptions.spline.gapSize = s.gapsize;
                     options.plotOptions.scatter.gapSize = s.gapsize;
                 }
-                
+                // Check if this series has a minSize override
+                if (s.minsize) {
+                    options.plotOptions.bubble.minSize = s.minsize;
+                }
+                // Check if this series has a maxSize override
+                if (s.maxsize) {
+                    options.plotOptions.bubble.maxSize = s.maxsize;
+                }
                 // If this chart is a mirrored chart, make the yAxis labels non-negative
                 if ( s.mirrored_value ) {
                     belchertown_debug( options.chart.renderTo + ": mirrored chart due to mirrored_value = true" );
