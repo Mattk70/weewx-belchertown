@@ -2339,8 +2339,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     "gapsize", 300000
                 )  # Default to 5 minutes in millis
                 if gapsize:
-                    output[chart_group][plotname]["options"]["gapsize"] = gapsize * 1000
-
+                    output[chart_group][plotname]["options"]["gapsize"] = int(gapsize) * 1000
                 connectNulls = plot_options.get("connectNulls", "false")
                 output[chart_group][plotname]["options"]["connectNulls"] = connectNulls
 
@@ -3477,6 +3476,8 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     order_sql = ' ORDER BY dateTime ASC'
             else:
                     order_sql = ''
+
+
 
             if driver == "weedb.sqlite":
                 sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, IFNULL({2}({3}),0) as obs, dateTime FROM archive WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6}{7}};'.format(
