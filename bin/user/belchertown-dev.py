@@ -537,19 +537,31 @@ class getData(SearchList):
         # 3. We need to recalculate the min/max range because the unit may have changed.
 
         year_outTemp_max_range_query = wx_manager.getSql(
-            "SELECT dateTime, ROUND( (max - min), 1 ) as total, ROUND( min, 1 ) as min, ROUND( max, 1 ) as max FROM archive_day_outTemp WHERE dateTime >= %s AND dateTime < %s AND min IS NOT NULL AND max IS NOT NULL ORDER BY total DESC LIMIT 1;"
+            "SELECT dateTime, ROUND( (max - min), 1 ) as total, "
+            "ROUND( min, 1 ) as min, ROUND( max, 1 ) as max "
+            "FROM archive_day_outTemp WHERE dateTime >= %s AND dateTime < %s AND min IS NOT NULL AND max IS NOT NULL "
+            "ORDER BY total DESC LIMIT 1;"
             % (year_start_epoch, today_start_epoch)
         )
         year_outTemp_min_range_query = wx_manager.getSql(
-            "SELECT dateTime, ROUND( (max - min), 1 ) as total, ROUND( min, 1 ) as min, ROUND( max, 1 ) as max FROM archive_day_outTemp WHERE dateTime >= %s AND dateTime < %s AND min IS NOT NULL AND max IS NOT NULL ORDER BY total ASC LIMIT 1;"
+            "SELECT dateTime, ROUND( (max - min), 1 ) as total, "
+            "ROUND( min, 1 ) as min, ROUND( max, 1 ) as max "
+            "FROM archive_day_outTemp WHERE dateTime >= %s AND dateTime < %s AND min IS NOT NULL AND max IS NOT NULL "
+            "ORDER BY total ASC LIMIT 1;"
             % (year_start_epoch, today_start_epoch)
         )
         at_outTemp_max_range_query = wx_manager.getSql(
-            "SELECT dateTime, ROUND( (max - min), 1 ) as total, ROUND( min, 1 ) as min, ROUND( max, 1 ) as max FROM archive_day_outTemp WHERE dateTime < %s AND min IS NOT NULL AND max IS NOT NULL ORDER BY total DESC LIMIT 1;"
+            "SELECT dateTime, ROUND( (max - min), 1 ) as total, "
+            "ROUND( min, 1 ) as min, ROUND( max, 1 ) as max "
+            "FROM archive_day_outTemp WHERE dateTime < %s AND min IS NOT NULL AND max IS NOT NULL "
+            "ORDER BY total DESC LIMIT 1;"
             % today_start_epoch
         )
         at_outTemp_min_range_query = wx_manager.getSql(
-            "SELECT dateTime, ROUND( (max - min), 1 ) as total, ROUND( min, 1 ) as min, ROUND( max, 1 ) as max FROM archive_day_outTemp WHERE dateTime < %s AND min IS NOT NULL AND max IS NOT NULL ORDER BY total ASC LIMIT 1;"
+            "SELECT dateTime, ROUND( (max - min), 1 ) as total, "
+            "ROUND( min, 1 ) as min, ROUND( max, 1 ) as max "
+            "FROM archive_day_outTemp WHERE dateTime < %s AND min IS NOT NULL AND max IS NOT NULL "
+            "ORDER BY total ASC LIMIT 1;"
             % today_start_epoch
         )
 
@@ -725,6 +737,11 @@ class getData(SearchList):
         rain_round = self.generator.skin_dict["Units"]["StringFormats"].get(
             skin_rain_unit, "%.2f"
         )
+        # Find the group_name for sunshine
+        sunshine_unit = converter.group_unit_dict["group_time"]
+
+        # Find the number of decimals to round to
+        sunshine_round = self.generator.skin_dict['Units']['StringFormats'].get(sunshine_unit, "%.2f")
 
         # Rainiest Day
         rainiest_day_query = wx_manager.getSql(
@@ -760,9 +777,7 @@ class getData(SearchList):
         # correctly tailored SQL Query for each type of database
         data_binding = self.generator.config_dict["StdArchive"]["data_binding"]
         database = self.generator.config_dict["DataBindings"][data_binding]["database"]
-        database_type = self.generator.config_dict["Databases"][database][
-            "database_type"
-        ]
+        database_type = self.generator.config_dict["Databases"][database]["database_type"]
         driver = self.generator.config_dict["DatabaseTypes"][database_type]["driver"]
         if driver == "weedb.sqlite":
             year_rainiest_month_sql = (
@@ -779,19 +794,114 @@ class getData(SearchList):
             # correctly.
             at_rain_highest_year_sql = 'SELECT strftime("%Y", datetime(dateTime, "unixepoch")) as year, ROUND( SUM( sum ), 2 ) as total FROM archive_day_rain GROUP BY year ORDER BY total DESC LIMIT 1;'
         elif driver == "weedb.mysql":
-            year_rainiest_month_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ROUND( SUM( sum ), 2 ) AS total FROM archive_day_rain WHERE year( FROM_UNIXTIME( dateTime ) ) = "{0}" GROUP BY month ORDER BY total DESC LIMIT 1;'.format(
-                time.strftime("%Y", time.localtime(time.time()))
-            )  # Why does this one require .format() but the other's don't?
-            at_rainiest_month_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, FROM_UNIXTIME( dateTime, "%%Y" ) AS year, ROUND( SUM( sum ), 2 ) AS total FROM archive_day_rain GROUP BY month, year ORDER BY total DESC LIMIT 1;'
-            year_rain_data_sql = (
-                    'SELECT dateTime, ROUND( sum, 2 ) FROM archive_day_rain WHERE year( FROM_UNIXTIME( dateTime ) ) = "%s" AND count > 0;'
-                    % time.strftime("%Y", time.localtime(time.time()))
-            )
-            # The all stats from http://www.weewx.com/docs/customizing.htm
-            # doesn't seem to calculate "Total Rainfall for" all time stat
-            # correctly.
-            at_rain_highest_year_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%Y" ) AS year, ROUND( SUM( sum ), 2 ) AS total FROM archive_day_rain GROUP BY year ORDER BY total DESC LIMIT 1;'
+            year_sunniest_month_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
+                                      'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_sunshine ' \
+                                      'WHERE year( FROM_UNIXTIME( dateTime ) ) = "{0}" ' \
+                                      'GROUP BY month ORDER BY total DESC LIMIT 1;'.format(
+                time.strftime("%Y", time.localtime(
+                    time.time())))  # Why does this one require .format() but the other's don't?
+            at_sunniest_month_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
+                                    'FROM_UNIXTIME( dateTime, "%%Y" ) AS year, ROUND( SUM( sum ), 2 ) AS total ' \
+                                    'FROM archive_day_sunshine GROUP BY month, year ORDER BY total DESC LIMIT 1;'
+            year_cloudiest_month_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
+                                       'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_sunshine ' \
+                                       'WHERE year( FROM_UNIXTIME( dateTime ) ) = "{0}" ' \
+                                       'AND dateTime >= 1583020800 ' \
+                                       'AND (FROM_UNIXTIME(dateTime) < DATE_FORMAT(NOW(), "%%Y-%%m-01") ) ' \
+                                       'GROUP BY month ORDER BY total ASC LIMIT 1;'.format(
+                time.strftime("%Y", time.localtime(
+                    time.time())))
+            # Why does this one require .format() but the other's don't?
+            # dateTime >= 1583020800 <- 1ST MARCH = 1ST FULL MONTH AFTER RADIATION SENSOR INSTALLED
+            at_cloudiest_month_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
+                                     'FROM_UNIXTIME( dateTime, "%%Y" ) AS year, ROUND( SUM( sum ), 2 ) AS total ' \
+                                     'FROM archive_day_sunshine WHERE dateTime >= 1583020800 ' \
+                                     'AND (FROM_UNIXTIME(dateTime) < DATE_FORMAT(NOW(), "%%Y-%%m-01") ) ' \
+                                     'GROUP BY month, year ORDER BY total ASC LIMIT 1;'
+            year_rainiest_month_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
+                                      'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_rain ' \
+                                      'WHERE year( FROM_UNIXTIME( dateTime ) ) = "{0}" ' \
+                                      'GROUP BY month ORDER BY total DESC LIMIT 1;'.format(
+                time.strftime("%Y", time.localtime(
+                    time.time())))  # Why does this one require .format() but the other's don't?
+            at_rainiest_month_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
+                                    'FROM_UNIXTIME( dateTime, "%%Y" ) AS year, ROUND( SUM( sum ), 2 ) AS total ' \
+                                    'FROM archive_day_rain GROUP BY month, year ORDER BY total DESC LIMIT 1;'
+            year_rain_data_sql = 'SELECT dateTime, ROUND( sum, 2 ) FROM archive_day_rain ' \
+                                 'WHERE year( FROM_UNIXTIME( dateTime ) ) = "%s" AND count > 0;' \
+                                 % time.strftime("%Y", time.localtime(time.time()))
+            # The all stats from http://www.weewx.com/docs/customizing.htm doesn't seem to
+            # calculate "Total Rainfall for" all time stat correctly.
+            at_rain_highest_year_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%Y" ) AS year, ' \
+                                       'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_rain ' \
+                                       'GROUP BY year ORDER BY total DESC LIMIT 1;'
 
+            # Sunniest month
+        year_sunniest_month_query = wx_manager.getSql(year_sunniest_month_sql)
+        if year_sunniest_month_query is not None:
+            year_sunniest_month_tuple = (year_sunniest_month_query[1], sunshine_unit, 'group_time')
+            year_sunniest_month_converted = year_sunniest_month_tuple[0]
+            # year_sunniest_month_converted = sunshine_round % self.generator.converter.convert(
+            # year_sunniest_month_tuple)[0] Python 2/3 hack
+            try:
+                year_sunniest_month_name = calendar.month_name[int(year_sunniest_month_query[0])].decode(
+                    'utf-8')  # Python 2
+            except:
+                year_sunniest_month_name = calendar.month_name[int(year_sunniest_month_query[0])]
+            year_sunniest_month = [year_sunniest_month_name, locale.format("%g", float(year_sunniest_month_converted))]
+            # logerr("sunniest month: %s" % year_sunniest_month) 
+
+        else:
+            year_sunniest_month = ["N/A", 0.0]
+
+        # All time sunniest month
+        at_sunniest_month_query = wx_manager.getSql(at_sunniest_month_sql)
+        at_sunniest_month_tuple = (at_sunniest_month_query[2], sunshine_unit, 'group_time')
+        at_sunniest_month_converted = at_sunniest_month_tuple[0]
+        # at_sunniest_month_converted = sunshine_round % self.generator.converter.convert(at_sunniest_month_tuple)[0]
+        # Python 2/3 hack
+        try:
+            at_sunniest_month_name = calendar.month_name[int(at_sunniest_month_query[0])].decode('utf-8')  # Python 2
+        except:
+            at_sunniest_month_name = calendar.month_name[int(at_sunniest_month_query[0])]
+        at_sunniest_month = [
+            "%s, %s" % (at_sunniest_month_name, at_sunniest_month_query[1]),
+            locale.format("%g", float(at_sunniest_month_converted))
+        ]
+
+        # Cloudiest month
+        year_cloudiest_month_query = wx_manager.getSql(year_cloudiest_month_sql)
+        if year_cloudiest_month_query is not None:
+            year_cloudiest_month_tuple = (year_cloudiest_month_query[1], sunshine_unit, 'group_time')
+            year_cloudiest_month_converted = year_cloudiest_month_tuple[0]
+            # year_cloudiest_month_converted = sunshine_round % self.generator.converter.convert(
+            # year_cloudiest_month_tuple)[0] Python 2/3 hack
+            try:
+                year_cloudiest_month_name = calendar.month_name[int(year_cloudiest_month_query[0])].decode(
+                    'utf-8')  # Python 2
+            except:
+                year_cloudiest_month_name = calendar.month_name[int(year_cloudiest_month_query[0])]
+            year_cloudiest_month = [year_cloudiest_month_name,
+                                    locale.format("%g", float(year_cloudiest_month_converted))]
+            # logerr("cloudiest month: %s" % year_cloudiest_month) 
+
+        else:
+            year_cloudiest_month = ["N/A", 0.0]
+
+        # All time cloudiest month
+        at_cloudiest_month_query = wx_manager.getSql(at_cloudiest_month_sql)
+        at_cloudiest_month_tuple = (at_cloudiest_month_query[2], sunshine_unit, 'group_time')
+        at_cloudiest_month_converted = at_cloudiest_month_tuple[0]
+        # t_cloudiest_month_converted = sunshine_round % self.generator.converter.convert(at_cloudiest_month_tuple)[0]
+        # Python 2/3 hack
+        try:
+            at_cloudiest_month_name = calendar.month_name[int(at_cloudiest_month_query[0])].decode('utf-8')  # Python 2
+        except:
+            at_cloudiest_month_name = calendar.month_name[int(at_cloudiest_month_query[0])]
+        at_cloudiest_month = [
+            "%s, %s" % (at_cloudiest_month_name, at_cloudiest_month_query[1]),
+            locale.format("%g", float(at_cloudiest_month_converted))
+        ]
         # Rainiest month
         year_rainiest_month_query = wx_manager.getSql(year_rainiest_month_sql)
         if year_rainiest_month_query is not None:
@@ -2077,7 +2187,11 @@ class getData(SearchList):
             "rainiest_day": rainiest_day,
             "at_rainiest_day": at_rainiest_day,
             "year_rainiest_month": year_rainiest_month,
+            "year_sunniest_month": year_sunniest_month,
+            "year_cloudiest_month": year_cloudiest_month,
             "at_rainiest_month": at_rainiest_month,
+            "at_sunniest_month": at_sunniest_month,
+            "at_cloudiest_month": at_cloudiest_month,
             "at_rain_highest_year": at_rain_highest_year,
             "year_days_with_rain": year_days_with_rain,
             "year_days_without_rain": year_days_without_rain,
@@ -2692,6 +2806,13 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     # data, then generate the data output
                     output[chart_group][plotname]["series"][line_name]["name"] = name
 
+                    # Set the xAxis min and max if present. Useful for the WeatherRadials
+                    xAxis_min = line_options.get('xAxis_min', None)
+                    if xAxis_min:
+                        output[chart_group][plotname]["series"][line_name]["xAxis_min"] = xAxis_min
+                    xAxis_max = line_options.get('xAxis_max', None)
+                    if xAxis_max:
+                        output[chart_group][plotname]["series"][line_name]["xAxis_max"] = xAxis_max
                     # Set the yAxis min and max if present. Useful for the
                     # rxCheckPercent plots
                     yAxis_min = line_options.get("yAxis_min", None)
