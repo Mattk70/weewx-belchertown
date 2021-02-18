@@ -2496,6 +2496,13 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     output[chart_group][plotname]["options"]["exporting"] = "true"
                 else:
                     output[chart_group][plotname]["options"]["exporting"] = "false"
+                # Setup polar chart option
+                polar = plot_options.get("polar", None)
+                if exporting is not None and to_bool(polar):
+                    # Only turn on exporting if it's not none and it's true (1 or True)
+                    output[chart_group][plotname]["options"]["polar"] = "true"
+                else:
+                    output[chart_group][plotname]["options"]["polar"] = "false"
 
                 # Loop through each [[[observation]]] within the chart_group.
                 for line_name in self.chart_dict[chart_group][plotname].sections:
@@ -2780,17 +2787,6 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     css_class = line_options.get("css_class", None)
                     output[chart_group][plotname]["options"]["css_class"] = css_class
 
-                    # Setup polar charts
-                    polar = line_options.get("polar", None)
-                    if polar is not None and to_bool(polar):
-                        # Only turn on polar if it's not none and it's true (1 or True)
-                        output[chart_group][plotname]["series"][line_name][
-                            "polar"
-                        ] = "true"
-                    else:
-                        output[chart_group][plotname]["series"][line_name][
-                            "polar"
-                        ] = "false"
 
                     # This for loop is to get any user provided highcharts
                     # series config data. Built-in highcharts variable names
