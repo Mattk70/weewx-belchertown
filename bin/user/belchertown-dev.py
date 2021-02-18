@@ -3415,40 +3415,146 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             if aggregate_type is None:
                 aggregate_type = "sum"
 
+            if isinstance(time_length, int):
+                    order_sql = ' ORDER BY dateTime ASC'
+            else:
+                    order_sql = ''
+
             if driver == "weedb.sqlite":
-                if isinstance(time_length, int):
-                    sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, IFNULL({2}({3}),0) as obs, dateTime FROM archive WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6} ORDER BY dateTime ASC;'.format(
-                        strformat,
-                        xAxis_groupby,
-                        aggregate_type,
-                        obs_lookup,
-                        start_ts,
-                        end_ts,
-                        xAxis_groupby,
-                    )
-                else:
-                    sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, IFNULL({2}({3}),0) as obs FROM archive WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6};'.format(
-                        strformat,
-                        xAxis_groupby,
-                        aggregate_type,
-                        obs_lookup,
-                        start_ts,
-                        end_ts,
-                        xAxis_groupby,
-                    )
+                sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, IFNULL({2}({3}),0) as obs, dateTime FROM archive WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6}{7}};'.format(
+                    strformat,
+                    xAxis_groupby,
+                    aggregate_type,
+                    obs_lookup,
+                    start_ts,
+                    end_ts,
+                    xAxis_groupby,
+                    order_sql
+                )
             elif driver == "weedb.mysql":
-                if isinstance(time_length, int):
-                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, IFNULL({2}({3}),0) as obs, dateTime FROM archive WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6} ORDER BY dateTime ASC;'.format(
+                # Permit meanmax aggregation type
+                if aggregate_type == "meanmax":
+                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
+                                 'AVG(max) as obs FROM archive_day_{2} ' \
+                                 'WHERE dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
                         strformat,
                         xAxis_groupby,
-                        aggregate_type,
                         obs_lookup,
                         start_ts,
                         end_ts,
+                        order_sql
+                        )
+                # Permit meanmin aggregation type
+                elif aggregate_type == "meanmin":
+                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
+                                 'AVG(min) as obs FROM archive_day_{2} ' \
+                                 'WHERE dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                        strformat,
                         xAxis_groupby,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        order_sql
+                        )
+                # introduce count aggregation type (number of times observed)
+                # Useful for # rain days, etc.
+                elif aggregate_type == "countrain":
+                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
+                                 'COUNT(sum) as obs FROM archive_day_{2} ' \
+                                 'WHERE sum > 0.01 AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                        strformat,
+                        xAxis_groupby,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        order_sql
+                        )
+                # introduce meansum aggregation type (sum the totals per month divide by # of months in the archive)
+                # Useful for climate values e.g. Rain or sunshine hours average in a month
+                elif aggregate_type == "meansum":
+                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
+                                 'SUM(sum) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) as obs ' \
+                                 'FROM archive_day_{2} ' \
+                                 'WHERE min IS NOT NULL AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                        strformat,
+                        xAxis_groupby,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        order_sql
+                        )
+                # introduce dailyavg aggregation type (sum the totals per month divide by # of months in the archive)
+                # Useful for climate values e.g. Daily Rain or sunshine hours average total in a month
+                # 'min' is NULL  when observation is missing so excluded to protect averages
+                elif aggregate_type == "dailyavg":
+                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
+                                 'round(AVG(sum),2) as obs FROM archive_day_{2} ' \
+                                 'WHERE min IS NOT NULL AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                        strformat,
+                        xAxis_groupby,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        order_sql
+                        )
+                # introduce meancountrain aggregation type (number of times observed)
+                # Used for # rain days
+                elif aggregate_type == "meancountrain":
+                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
+                                 'COUNT(sum) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) as obs ' \
+                                 'FROM archive_day_{2} ' \
+                                 'WHERE sum >0.01 AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                        strformat,
+                        xAxis_groupby,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        order_sql
+                        )
+                # introduce meancountfrost aggregation type (number of times observed)
+                # Used for frost days. Database units MUST be US <--change me
+                elif aggregate_type == "meancountfrost":
+                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
+                                 '(COUNT(CASE WHEN min <= 32 THEN 1 END) / ' \
+                                 'COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%%m%%Y"))) as obs ' \
+                                 'FROM archive_day_outTemp WHERE dateTime >= {0} AND dateTime <= {1} ' \
+                                 'GROUP BY month;'.format(
+                        start_ts,
+                        end_ts
                     )
+                    # duck upcoming unit conversion
+                    obs_lookup = ""
+                # Use daily summaries where possible
+                elif aggregate_interval >= 86400:  # 1 day
+                    # Avg is a special case
+                    if aggregate_type == "avg":
+                        sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
+                                     'ROUND(SUM(wsum)/ SUM(count),2) as obs ' \
+                                     'FROM archive_day_{2}  WHERE dateTime >= {3} AND dateTime <= {4} ' \
+                                     'GROUP BY {1}{5};'.format(
+                        strformat,
+                        xAxis_groupby,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        order_sql
+                        )
+                    else:
+                        sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, {2}({2}) as obs ' \
+                                     'FROM archive_day_{3}  ' \
+                                     'WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {1}{6};'.format(
+                            strformat,
+                            xAxis_groupby,
+                            aggregate_type,
+                            obs_lookup,
+                            start_ts,
+                            end_ts,
+                            order_sql
+                        )
                 else:
-                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, IFNULL({2}({3}),0) as obs FROM archive WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6};'.format(
+                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
+                                 'IFNULL({2}({3}),0) as obs ' \
+                                 'FROM archive WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6}{7};'.format(
                         strformat,
                         xAxis_groupby,
                         aggregate_type,
@@ -3456,6 +3562,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                         start_ts,
                         end_ts,
                         xAxis_groupby,
+                        order_sql
                     )
 
             # Setup values for the converter
