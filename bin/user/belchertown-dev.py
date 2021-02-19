@@ -2739,10 +2739,10 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     # Set a default yAxis label if graphs.conf yAxis_label is
                     # none and there's a unit_label - e.g. Temperature (F)
                     if yAxisLabel_config is None and unit_label:
-                        logerr("weather range obs lookup is %s. there is _no_ yaxis label config and there is unit label, Unit label is %s: " % obs_label, unit_label)
+                        logerr("weather range obs lookup is " + obs_label + " there is _no_ yaxis label config and there is unit label, Unit label is " + unit_label)
                         yAxis_label = name + " (" + unit_label.strip() + ")"
                     elif yAxisLabel_config and unit_label:
-                        logerr("weather range obs lookup is %s. there is a yaxis label config and a unit label, YAxis label conf is %s unit label is %s: " % obs_label,yAxisLabel_config, unit_label)
+                        logerr("weather range obs lookup is " + obs_label + ". there is a yaxis label config and a unit label, YAxis label conf is " + yAxisLabel_config + " unit label is: " + unit_label)
                         yAxis_label = (
                                 yAxisLabel_config + " (" + unit_label.strip() + ")"
                         )
