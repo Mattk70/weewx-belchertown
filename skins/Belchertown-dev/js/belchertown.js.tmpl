@@ -2720,10 +2720,10 @@ function showChart(json_file, prepend_renderTo=false) {
                 //
                 //options.plotOptions = {}
                 options.plotOptions.series = {
-                    turbothreshold: 0,
+                    turboThreshold: 0,
                     stacking: "normal",
-                    showinlegend: false,
-                    borderwidth: 0,
+                    showInLegend: false,
+                    borderWidth: 0,
                 }
                 // Add any annotations to the polar chart
                 var annotations = [];
@@ -2745,12 +2745,12 @@ function showChart(json_file, prepend_renderTo=false) {
 
                 // Update data
                 var currentSeries = options.series;
-                var currentSeriesData = options.series[0].data;
-                var range_unit = options.series[0].range_unit;
+                var currentSeriesData = options.series[arrayNum].data;
+                var range_unit = options.series[arrayNum].range_unit;
                 var newSeriesData = [];
                 currentSeriesData.forEach( seriesData => {
-                    if ( options.series[0].color ) {
-                        var color = options.series[0].color;
+                    if ( options.series[arrayNum].color ) {
+                        var color = options.series[arrayNum].color;
                     } else {
                         // Set color of the column based on the average temperature, or return default if not temperature
                         var color = get_outTemp_color( range_unit, seriesData[3], true );                    
