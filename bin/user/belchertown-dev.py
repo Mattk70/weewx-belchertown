@@ -2741,8 +2741,6 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     if yAxisLabel_config is None and unit_label:
                          yAxis_label = name + " (" + unit_label.strip() + ")"
                     elif yAxisLabel_config and unit_label:
-                        if (chart_group == "columnrange"):
-                            logerr("plotname is: " + plotname + "weather range obs lookup is " + obs_label + ". there is a yaxis label config and a unit label, YAxis label conf is " + yAxisLabel_config + " unit label is: " + unit_label)
                         yAxis_label = (
                                 yAxisLabel_config + " (" + unit_label.strip() + ")"
                         )
