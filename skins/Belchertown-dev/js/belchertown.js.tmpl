@@ -2719,14 +2719,12 @@ function showChart(json_file, prepend_renderTo=false) {
                 //}
 
 
-                options.plotOptions = {}
-                options.plotOptions = {
-                  series: {
+                //options.plotOptions = {}
+                options.plotOptions.series = {
                     turboThreshold: 0,
                     stacking: "normal",
                     showInLegend: false,
                     borderWidth: 0,
-                  }
                 }
                 // Add any annotations to the polar chart
                 var annotations = [];
