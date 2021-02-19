@@ -372,7 +372,7 @@ class getData(SearchList):
             archive_interval_ms = (
                 300000  # 300*1000 for archive_interval emulated to millis
             )
-        logerr("archive interval ms is : %s" % archive_interval_ms)
+
         # Get the ordinal labels
         ordinate_names = self.get_cardinal_direction("", True)
 
