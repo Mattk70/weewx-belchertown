@@ -2667,7 +2667,7 @@ function showChart(json_file, prepend_renderTo=false) {
                 // Find min and max of the series data for the yAxis min and max
                 var minimum_flattened = [];
                 var maximum_flattened = [];
-                options.series[0].data.forEach( seriesData => {
+                options.series[arrayNum].data.forEach( seriesData => {
                     minimum_flattened.push(seriesData[1]);
                     maximum_flattened.push(seriesData[2]);
                 });
