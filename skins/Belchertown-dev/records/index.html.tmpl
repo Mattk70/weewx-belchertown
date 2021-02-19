@@ -55,6 +55,9 @@
             jQuery("#year-rainRate-max-ts").text( moment.unix($year.rainRate.maxtime.raw).utcOffset($moment_js_utc_offset).format( "$obs.label.time_records_page_full_date" ) );
             jQuery("#at-rainRate-max-ts").text( moment.unix($alltime.rainRate.maxtime.raw).utcOffset($moment_js_utc_offset).format( "$obs.label.time_records_page_full_date" ) );
             
+            jQuery("#year-stormRain-max-ts").text( moment.unix($year.stormRain.maxtime.raw).utcOffset($moment_js_utc_offset).format( "$obs.label.time_records_page_full_date" ) );
+            jQuery("#at-stormRain-max-ts").text( moment.unix($alltime.stormRain.maxtime.raw).utcOffset($moment_js_utc_offset).format( "$obs.label.time_records_page_full_date" ) );
+
             jQuery("#year-outHumidity-max-ts").text( moment.unix($year.outHumidity.maxtime.raw).utcOffset($moment_js_utc_offset).format( "$obs.label.time_records_page_full_date" ) );
             jQuery("#at-outHumidity-max-ts").text( moment.unix($alltime.outHumidity.maxtime.raw).utcOffset($moment_js_utc_offset).format( "$obs.label.time_records_page_full_date" ) );
             
@@ -243,6 +246,13 @@
                                 <td>$alltime.rainRate.max</td>
                             </tr>
                             <tr>
+                            <td>$obs.label.records_wettest_storm</td>
+                                <td class="leftborder">$year.stormRain.max</td>
+                                <td id="year-stormRain-max-ts"></td><!-- moment.js -->
+                                <td class="leftborder" id="year-stormRain-max-ts"></td><!-- moment.js -->
+                                <td>$alltime.stormRain.max</td>
+                            </tr>
+                            <tr>
                                 <td>$obs.label.records_month_high_rainfall</td>
                                 <td class="leftborder">$year_rainiest_month[1] $unit.label.rain</td>
                                 <td>$year_rainiest_month[0]</td>
@@ -347,6 +357,20 @@
                                 <td id="year-radiation-max-ts"></td><!-- moment.js -->
                                 <td class="leftborder" id="at-radiation-max-ts"></td><!-- moment.js -->
                                 <td>$alltime.radiation.max</td>
+                            </tr>
+                            <tr>
+                                <td>$obs.label.records_month_high_sunshine</td>
+                                <td class="leftborder">$year_sunniest_month[1] hours</td>
+                                <td>$year_sunniest_month[0]</td>
+                                <td class="leftborder">$at_sunniest_month[0]</td>
+                                <td>$at_sunniest_month[1] hours</td>
+                            </tr>
+                            <tr>
+                                <td>$obs.label.records_month_low_sunshine</td>
+                                <td class="leftborder">$year_cloudiest_month[1] hours</td>
+                                <td>$year_cloudiest_month[0]</td>
+                                <td class="leftborder">$at_cloudiest_month[0]</td>
+                                <td>$at_cloudiest_month[1] hours</td>
                             </tr>
                             #end if
                             #if $year.UV.has_data
