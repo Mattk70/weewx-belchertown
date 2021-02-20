@@ -1997,9 +1997,6 @@ function showChart(json_file, prepend_renderTo=false) {
                     case "exporting":
                         exporting_enabled = optionVal;
                         break;
-//                    case "polar":
-//                        polar = optionVal;
-//                        break;
                 }
             });
             
@@ -2014,7 +2011,6 @@ function showChart(json_file, prepend_renderTo=false) {
                     spacing: [5, 10, 10, 0],
                     type: '',
                     zoomType: 'x',
-//                    polar:  JSON.parse( String( polar ) ), // Convert string to bool
           	        events: {
                 	    redraw: function () {
 	                    	hideZeroDots(this);
