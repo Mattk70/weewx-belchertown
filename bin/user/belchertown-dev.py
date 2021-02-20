@@ -3633,16 +3633,16 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
                              'IFNULL({2}({3}),0) as obs, dateTime FROM archive ' \
                              'WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6}{7}};'.format(
-                    strformat,
-                    xAxis_groupby,
-                    aggregate_type,
-                    obs_lookup,
-                    start_ts,
-                    end_ts,
-                    xAxis_groupby,
-                    order_sql
-                )
-             elif driver == "weedb.mysql":
+                        strformat,
+                        xAxis_groupby,
+                        aggregate_type,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        xAxis_groupby,
+                        order_sql
+                        )
+            elif driver == "weedb.mysql":
                 # Permit meanmax aggregation type
                 if aggregate_type == "meanmax":
                     sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
