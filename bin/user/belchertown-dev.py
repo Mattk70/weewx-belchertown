@@ -3790,11 +3790,11 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             for row in query:
                 xAxis_labels.append(row[0])
                 logerr("before conversion: ")
-                logerr(*row[1])
+                logerr(str(row[1])[1:-1]  )
                 row_tuple = (row[1], obs_unit_from_target_unit, obs_group)
                 row_converted = self.converter.convert(row_tuple)
                 logerr("after conversion: ")
-                logerr(*row_converted[0])
+                logerr(str(row_converted[0])[1:-1]  )
                 obsvalues.append(row_converted[0])
 
             # If the values are to be mirrored, we need to make them negative
