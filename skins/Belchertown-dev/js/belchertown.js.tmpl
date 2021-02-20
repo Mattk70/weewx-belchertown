@@ -2650,6 +2650,7 @@ function showChart(json_file, prepend_renderTo=false) {
                 // For now, weatherRange must be the last plot in the chart definition so this works:
                 var arrayNum = options.series.length -1;
 		        var polar = false;
+		        belchertown_debug("s series polar value is" + s.polar + "series[arraynum] polar value is" + options.series[arrayNum].polar)
                 if ( JSON.parse( String( options.series[arrayNum].polar.toLowerCase() ) ) ) {
 		            polar = true;
                     options.chart.polar = true; // Make sure the option is a string, then convert to bool
