@@ -3707,7 +3707,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     # duck upcoming unit conversion
                     obs_lookup = ""
                 # Use daily summaries where possible
-                elif aggregate_interval >= 86400:  # 1 day
+"""                elif aggregate_interval >= 86400:  # 1 day
                     # Avg is a special case
                     if aggregate_type == "avg":
                         sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
@@ -3733,6 +3733,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                             end_ts,
                             order_sql
                         )
+"""
                 else:
                     sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
                                  'IFNULL({2}({3}),0) as obs ' \
