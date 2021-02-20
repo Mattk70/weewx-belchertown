@@ -3596,14 +3596,43 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 aggregate_type = "sum"
 
             if isinstance(time_length, int):
-                    order_sql = ' ORDER BY dateTime ASC'
+                order_sql = ' ORDER BY dateTime ASC'
             else:
-                    order_sql = ''
-
-
+                order_sql = ''
 
             if driver == "weedb.sqlite":
-                sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, IFNULL({2}({3}),0) as obs, dateTime FROM archive WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6}{7}};'.format(
+                # Use daily summaries where possible
+                if (aggregate_interval >= 86400 and aggregate_interval % 86400 == 0) :  # 1 or more exact days
+                    # Avg is a special case
+                    if aggregate_type == "avg":
+                        sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) AS {1}, ' \
+                                     'ROUND(SUM(wsum)/ SUM(count),2) as obs ' \
+                                     'FROM archive_day_{2}  WHERE dateTime >= {3} AND dateTime <= {4} ' \
+                                     'GROUP BY {1}{5};'.format(
+                            strformat,
+                            xAxis_groupby,
+                            obs_lookup,
+                            start_ts,
+                            end_ts,
+                            order_sql
+                        )
+                    else:
+                        sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) AS {1}, ' \
+                                     '{2}({2}) as obs ' \
+                                     'FROM archive_day_{3}  ' \
+                                     'WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {1}{6};'.format(
+                            strformat,
+                            xAxis_groupby,
+                            aggregate_type,
+                            obs_lookup,
+                            start_ts,
+                            end_ts,
+                            order_sql
+                        )
+                else:
+                sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
+                             'IFNULL({2}({3}),0) as obs, dateTime FROM archive ' \
+                             'WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6}{7}};'.format(
                     strformat,
                     xAxis_groupby,
                     aggregate_type,
@@ -3613,7 +3642,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     xAxis_groupby,
                     order_sql
                 )
-            elif driver == "weedb.mysql":
+             elif driver == "weedb.mysql":
                 # Permit meanmax aggregation type
                 if aggregate_type == "meanmax":
                     sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
@@ -3707,7 +3736,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     # duck upcoming unit conversion
                     obs_lookup = ""
                 # Use daily summaries where possible
-                elif aggregate_interval >= 86400:  # 1 day
+                elif (aggregate_interval >= 86400 and aggregate_interval % 86400 == 0) :  # 1 or more exact days
                     # Avg is a special case
                     if aggregate_type == "avg":
                         sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
