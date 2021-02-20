@@ -2650,7 +2650,6 @@ function showChart(json_file, prepend_renderTo=false) {
                 // For now, weatherRange must be the last plot in the chart definition so this works:
                 var arrayNum = options.series.length -1;
 		        var polar = false;
-		        belchertown_debug("s series polar value is" + s.polar + "series[arraynum] polar value is" + options.series[arrayNum].polar)
                 if ( JSON.parse( String( options.series[arrayNum].polar.toLowerCase() ) ) ) {
 		            polar = true;
                     options.chart.polar = true; // Make sure the option is a string, then convert to bool
@@ -2681,12 +2680,12 @@ function showChart(json_file, prepend_renderTo=false) {
                     min: range_min,
                     max: range_max,
                     title: {
-                        text: options.series[arrayNum].yAxis_label,
+                        text: yAxis_label,
                     },
                 }
                 options.yAxis.gridLineDashStyle = polar ? "LongDashDot": "ShortDash";
-		options.yAxis.labels.x = polar ? 10:-2;
-		options.yAxis.labels.style = polar ? {'color': '#ccc', 'fontSize': '8px'}: {'color': '#999'};
+                options.yAxis.labels.x = polar ? 10:-2;
+                options.yAxis.labels.style = polar ? {'color': '#ccc', 'fontSize': '8px'}: {'color': '#999'};
 
 
    		options.yAxis.labels.formatter = function () {
