@@ -611,11 +611,9 @@ async function ajaxweewx() {
 //var station_obs_array = "";
 var unit_rounding_array = "";
 var unit_label_array = "";
-//var weewx_data = "";
 function update_weewx_data( data ) {
     belchertown_debug("Updating weewx data");
-//    weewx_data = data;
-    
+
     #if $Extras.has_key("theme") and $Extras.theme == 'auto'
     // Auto theme if enabled
     autoTheme(data["almanac"]["sunset_hour"], data["almanac"]["sunset_minute"], data["almanac"]["sunrise_hour"], data["almanac"]["sunrise_minute"] );
