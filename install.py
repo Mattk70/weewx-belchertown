@@ -169,6 +169,7 @@ files=[('bin/user', ['bin/user/belchertown-dev.py'
                               'skins/Belchertown-dev/about.inc.example',
                               'skins/Belchertown-dev/celestial.inc',
                               'skins/Belchertown-dev/graphs.conf.example',
+                              'skins/Belchertown-dev/graphs.conf',
                               'skins/Belchertown-dev/page-header.inc',
                               'skins/Belchertown-dev/manifest.json.tmpl',
                               'skins/Belchertown-dev/records.inc.example',
