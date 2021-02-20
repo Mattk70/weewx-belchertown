@@ -611,8 +611,10 @@ async function ajaxweewx() {
 //var station_obs_array = "";
 var unit_rounding_array = "";
 var unit_label_array = "";
+var weewx_data = "";
 function update_weewx_data( data ) {
     belchertown_debug("Updating weewx data");
+    weewx_data = data;
 
     #if $Extras.has_key("theme") and $Extras.theme == 'auto'
     // Auto theme if enabled
@@ -1995,9 +1997,9 @@ function showChart(json_file, prepend_renderTo=false) {
                     case "exporting":
                         exporting_enabled = optionVal;
                         break;
-                    case "polar":
-                        polar = optionVal;
-                        break;
+//                    case "polar":
+//                        polar = optionVal;
+//                        break;
                 }
             });
             
