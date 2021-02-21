@@ -3789,11 +3789,13 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             query = archive.genSql(sql_lookup)
             for row in query:
                 xAxis_labels.append(row[0])
-                logerr("before conversion: " + observation)
+                if aggregate_type == "meancountrain":
+                    logerr("before conversion: " + observation)
                 logerr(str(row[1])[:])
                 row_tuple = (row[1], obs_unit_from_target_unit, obs_group)
                 row_converted = self.converter.convert(row_tuple)
-                logerr("after conversion: ")
+                if aggregate_type == "meancountrain":
+                    logerr("after conversion: ")
                 logerr(str(row_converted[0])[:])
                 obsvalues.append(row_converted[0])
 
