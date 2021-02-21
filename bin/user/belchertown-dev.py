@@ -3712,7 +3712,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 # Used for # rain days
                 elif aggregate_type == "meancountrain":
                     sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
-                                 'COUNT(sum) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) as obs ' \
+                                 'COUNT(sum) %/ COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) as obs ' \
                                  'FROM archive_day_{2} ' \
                                  'WHERE sum >0.01 AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
                         strformat,
