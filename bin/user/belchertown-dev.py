@@ -3684,7 +3684,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 # Useful for climate values e.g. Rain or sunshine hours average in a month
                 elif aggregate_type == "meansum":
                     sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
-                                 'SUM(sum) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) as obs ' \
+                                 'COUNT(sum) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) as obs ' \
                                  'FROM archive_day_{2} ' \
                                  'WHERE min IS NOT NULL AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
                         strformat,
@@ -3712,7 +3712,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 # Used for # rain days
                 elif aggregate_type == "meancountrain":
                     sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
-                                 'COUNT(sum) %/ COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) as obs ' \
+                                 'COUNT(sum) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) as obs ' \
                                  'FROM archive_day_{2} ' \
                                  'WHERE sum >0.01 AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
                         strformat,
@@ -3787,7 +3787,6 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 obs_unit_from_target_unit = None
 
             query = archive.genSql(sql_lookup)
-            logerr("SQL lookup is" + sql_lookup)
             for row in query:
                 xAxis_labels.append(row[0])
                 row_tuple = (row[1], obs_unit_from_target_unit, obs_group)
