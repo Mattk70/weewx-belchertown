@@ -3734,7 +3734,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                         start_ts,
                         end_ts
                     )
-                    # duck upcoming unit conversion
+                    # duck upcoming unit conversion - this is not a temperature value
                     obs_lookup = ""
                 # Use daily summaries where possible
                 elif (aggregate_interval >= 86400 and aggregate_interval % 86400 == 0) :  # 1 or more exact days
