@@ -3728,7 +3728,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 elif aggregate_type == "meancountfrost":
                     sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
                                  'CAST(COUNT(CASE WHEN min <= 32 THEN 1 END) AS DECIMAL) / ' \
-                                 'COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%%m%%Y"))) as obs ' \
+                                 'COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%%m%%Y")) as obs ' \
                                  'FROM archive_day_outTemp WHERE dateTime >= {0} AND dateTime <= {1} ' \
                                  'GROUP BY month;'.format(
                         start_ts,
