@@ -3726,7 +3726,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 # Used for frost days. Database units MUST be US <--change me
                 elif aggregate_type == "meancountfrost":
                     sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
-                                 '(COUNT(CASE WHEN min <= 32 THEN 1 END) // ' \
+                                 '(COUNT(CASE WHEN min <= 32 THEN 1 END) / ' \
                                  'COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%%m%%Y"))) as obs ' \
                                  'FROM archive_day_outTemp WHERE dateTime >= {0} AND dateTime <= {1} ' \
                                  'GROUP BY month;'.format(
