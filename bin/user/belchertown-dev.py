@@ -3711,18 +3711,25 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 # introduce meancountrain aggregation type (number of times observed)
                 # Used for # rain days
                 elif aggregate_type == "meancountrain":
+                    threshold = 0.01
+                    if target_unit_nickname == "MetricWX":  # update threshold if the database rain not stored in inches
+                        threshold = 0.25    # native rain in mm
+                    elif target_unit_nickname == "Metric":  # native rain in cm
+                        threshold = 0.025
                     sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
                                  'CAST(COUNT(sum) AS FLOAT) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) ' \
                                  'as obs ' \
                                  'FROM archive_day_{2} ' \
                                  'WHERE sum >0.01 AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
-                        strformat,
-                        xAxis_groupby,
-                        obs_lookup,
-                        start_ts,
-                        end_ts,
-                        order_sql
-                        )
+                                    strformat,
+                                    xAxis_groupby,
+                                    obs_lookup,
+                                    start_ts,
+                                    end_ts,
+                                    order_sql
+                                    )
+                    #  duck upcoming unit conversion - series is not a station observation
+                    obs_lookup = ""
                 # introduce meancountfrost aggregation type (number of times observed)
                 # Used for frost days.
                 elif aggregate_type == "meancountfrost":
@@ -3734,14 +3741,14 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                                  'COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%%m%%Y")) as obs ' \
                                  'FROM archive_day_outTemp WHERE dateTime >= {1} AND dateTime <= {2} ' \
                                  'GROUP BY month;'.format(
-                        threshold,
-                        start_ts,
-                        end_ts
-                    )
-                    # duck upcoming unit conversion - this is not a temperature value
+                                    threshold,
+                                    start_ts,
+                                    end_ts
+                                    )
+                    # duck upcoming unit conversion - series is not a station observation
                     obs_lookup = ""
                 # Use daily summaries where possible
-                elif (aggregate_interval >= 86400 and aggregate_interval % 86400 == 0) :  # 1 or more exact days
+                elif aggregate_interval >= 86400 and aggregate_interval % 86400 == 0:  # 1 or more exact days
                     # Avg is a special case
                     if aggregate_type == "avg":
                         sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
