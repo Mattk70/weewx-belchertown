@@ -3712,7 +3712,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 # Used for # rain days
                 elif aggregate_type == "meancountrain":
                     sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%{0}" ) AS {1}, ' \
-                                 'COUNT(sum) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) as obs ' \
+                                 'CAST(COUNT(sum) AS DECIMAL) / CAST(COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) AS DECIMAL) as obs ' \
                                  'FROM archive_day_{2} ' \
                                  'WHERE sum >0.01 AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
                         strformat,
@@ -3726,7 +3726,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 # Used for frost days. Database units MUST be US <--change me
                 elif aggregate_type == "meancountfrost":
                     sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
-                                 '(COUNT(CASE WHEN min <= 32 THEN 1 END) / ' \
+                                 '(COUNT(CASE WHEN min <= 32 THEN 1 END) // ' \
                                  'COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%%m%%Y"))) as obs ' \
                                  'FROM archive_day_outTemp WHERE dateTime >= {0} AND dateTime <= {1} ' \
                                  'GROUP BY month;'.format(
@@ -3789,14 +3789,8 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             query = archive.genSql(sql_lookup)
             for row in query:
                 xAxis_labels.append(row[0])
-                if aggregate_type == "meancountrain":
-                    logerr("before conversion: " + observation)
-                logerr(str(row[1])[:])
                 row_tuple = (row[1], obs_unit_from_target_unit, obs_group)
                 row_converted = self.converter.convert(row_tuple)
-                if aggregate_type == "meancountrain":
-                    logerr("after conversion: ")
-                logerr(str(row_converted[0])[:])
                 obsvalues.append(row_converted[0])
 
             # If the values are to be mirrored, we need to make them negative
