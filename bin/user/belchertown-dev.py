@@ -3724,14 +3724,17 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                         order_sql
                         )
                 # introduce meancountfrost aggregation type (number of times observed)
-                # Used for frost days. Database units MUST be US <--change me
+                # Used for frost days.
                 elif aggregate_type == "meancountfrost":
-                    logerr("meancountfrost unit is " + target_unit_nickname)
+                    threshold = 0
+                    if target_unit_nickname == "US":  # update threshold if the database temp stored in degree_F
+                        threshold = 32
                     sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
-                                 'CAST(COUNT(CASE WHEN min <= 32 THEN 1 END) AS FLOAT) / ' \
+                                 'CAST(COUNT(CASE WHEN min <= {0} THEN 1 END) AS FLOAT) / ' \
                                  'COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%%m%%Y")) as obs ' \
-                                 'FROM archive_day_outTemp WHERE dateTime >= {0} AND dateTime <= {1} ' \
+                                 'FROM archive_day_outTemp WHERE dateTime >= {1} AND dateTime <= {2} ' \
                                  'GROUP BY month;'.format(
+                        threshold,
                         start_ts,
                         end_ts
                     )
