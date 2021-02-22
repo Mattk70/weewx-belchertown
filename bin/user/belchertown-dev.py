@@ -3773,7 +3773,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 else:
                     sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
                              'IFNULL({2}({3}),0) as obs, dateTime FROM archive ' \
-                             'WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6}{7}};'.format(
+                             'WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6}{7};'.format(
                         strformat,
                         xAxis_groupby,
                         aggregate_type,
