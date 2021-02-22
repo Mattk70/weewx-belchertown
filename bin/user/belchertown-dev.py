@@ -808,8 +808,6 @@ class getData(SearchList):
                                      'FROM archive_day_sunshine WHERE dateTime >= 1583020800 ' \
                                      'GROUP BY month, year ORDER BY total ASC LIMIT 1;'
                                   #       .format(time.strftime("%Y%m01", time.localtime(time.time())))
-            logerr(at_sunniest_month_sql)
-            logerr(at_cloudiest_month_sql)
             year_rainiest_month_sql = (
                                         'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, '
                                         'ROUND( SUM( sum ), 2 ) as total FROM archive_day_rain '
@@ -922,14 +920,12 @@ class getData(SearchList):
                 year_cloudiest_month_name = calendar.month_name[int(year_cloudiest_month_query[0])]
             year_cloudiest_month = [year_cloudiest_month_name,
                                     locale.format("%g", float(year_cloudiest_month_converted))]
-            # logerr("cloudiest month: %s" % year_cloudiest_month) 
 
         else:
             year_cloudiest_month = ["N/A", 0.0]
 
         # All time cloudiest month
         at_cloudiest_month_query = wx_manager.getSql(at_cloudiest_month_sql)
-        logerr(at_cloudiest_month_query)
         at_cloudiest_month_tuple = (at_cloudiest_month_query[2], sunshine_unit, 'group_time')
         at_cloudiest_month_converted = at_cloudiest_month_tuple[0]
         # t_cloudiest_month_converted = sunshine_round % self.generator.converter.convert(at_cloudiest_month_tuple)[0]
@@ -3941,6 +3937,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 obs_unit_from_target_unit = None
 
             query = archive.genSql(sql_lookup)
+            logerr(sql_lookup)
             for row in query:
                 xAxis_labels.append(row[0])
                 row_tuple = (row[1], obs_unit_from_target_unit, obs_group)
