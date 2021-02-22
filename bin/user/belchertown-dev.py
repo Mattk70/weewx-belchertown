@@ -793,9 +793,9 @@ class getData(SearchList):
                                     'FROM archive_day_sunshine GROUP BY month, year ORDER BY total DESC LIMIT 1;'
             year_cloudiest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
                                        'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_sunshine ' \
-                                       'WHERE strftime("%%Y", datetime(dateTime, "unixepoch")) = "{0}" ' \
+                                       'WHERE strftime("%Y", datetime(dateTime, "unixepoch")) = "{0}" ' \
                                        'AND dateTime >= 1583020800 ' \
-                                       'AND (strftime("%%Y%%m%%d", datetime(dateTime, "unixepoch")) < "{1}" ' \
+                                       'AND (strftime("%Y%m%d", datetime(dateTime, "unixepoch")) < "{1}" ' \
                                        'GROUP BY month ORDER BY total ASC LIMIT 1;'.format(
                                        time.strftime("%Y", time.localtime(time.time())),
                                        time.strftime("%Y%m01", time.localtime(time.time())))
@@ -839,7 +839,7 @@ class getData(SearchList):
                                       'WHERE year( FROM_UNIXTIME( dateTime ) ) = "{0}" ' \
                                       'GROUP BY month ORDER BY total DESC LIMIT 1;'.format(
                 time.strftime("%Y", time.localtime(
-                    time.time())))  # Why does this one require .format() but the other's don't?
+                    time.time())))  # Why does this one require .format() but the others don't?
             at_sunniest_month_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
                                     'FROM_UNIXTIME( dateTime, "%%Y" ) AS year, ROUND( SUM( sum ), 2 ) AS total ' \
                                     'FROM archive_day_sunshine GROUP BY month, year ORDER BY total DESC LIMIT 1;'
@@ -849,8 +849,7 @@ class getData(SearchList):
                                        'AND dateTime >= 1583020800 ' \
                                        'AND (FROM_UNIXTIME(dateTime) < DATE_FORMAT(NOW(), "%%Y-%%m-01") ) ' \
                                        'GROUP BY month ORDER BY total ASC LIMIT 1;'.format(
-                time.strftime("%Y", time.localtime(
-                    time.time())))
+                                        time.strftime("%Y", time.localtime(time.time())))
             # Why does this one require .format() but the other's don't?
             # dateTime >= 1583020800 <- 1ST MARCH = 1ST FULL MONTH AFTER RADIATION SENSOR INSTALLED
             at_cloudiest_month_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
