@@ -3940,7 +3940,6 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 obs_unit_from_target_unit = None
 
             query = archive.genSql(sql_lookup)
-            logerr(sql_lookup)
             for row in query:
                 xAxis_labels.append(row[0])
                 row_tuple = (row[1], obs_unit_from_target_unit, obs_group)
