@@ -3641,6 +3641,108 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 order_sql = ''
 
             if driver == "weedb.sqlite":
+                # Permit meanmax aggregation type
+                if aggregate_type == "meanmax":
+                    sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
+                                 'AVG(max) as obs FROM archive_day_{2} ' \
+                                 'WHERE dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                        strformat,
+                        xAxis_groupby,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        order_sql
+                    )
+                # Permit meanmin aggregation type
+                elif aggregate_type == "meanmin":
+                    sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
+                                 'AVG(min) as obs FROM archive_day_{2} ' \
+                                 'WHERE dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                        strformat,
+                        xAxis_groupby,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        order_sql
+                    )
+                # introduce count aggregation type (number of times observed)
+                # Useful for # rain days, etc.
+                elif aggregate_type == "countrain":
+                    sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
+                                 'COUNT(sum) as obs FROM archive_day_{2} ' \
+                                 'WHERE sum > 0.01 AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                        strformat,
+                        xAxis_groupby,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        order_sql
+                    )
+                # introduce meansum aggregation type (sum the totals per month divide by # of months in the archive)
+                # Useful for climate values e.g. Rain or sunshine hours average in a month
+                elif aggregate_type == "meansum":
+                    sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
+                                 'SUM(sum) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) as obs ' \
+                                 'FROM archive_day_{2} ' \
+                                 'WHERE min IS NOT NULL AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                        strformat,
+                        xAxis_groupby,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        order_sql
+                    )
+                # introduce dailyavg aggregation type (sum the totals per month divide by # of months in the archive)
+                # Useful for climate values e.g. Daily Rain or sunshine hours average total in a month
+                # 'min' is NULL  when observation is missing so excluded to protect averages
+                elif aggregate_type == "dailyavg":
+                    sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
+                                 'round(AVG(sum),2) as obs FROM archive_day_{2} ' \
+                                 'WHERE min IS NOT NULL AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                        strformat,
+                        xAxis_groupby,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        order_sql
+                    )
+                # introduce meancountrain aggregation type (number of times observed)
+                # Used for # rain days
+                elif aggregate_type == "meancountrain":
+                    threshold = 0.01
+                    if target_unit_nickname == "MetricWX":  # update threshold if the database rain not stored in inches
+                        threshold = 0.25  # native rain in mm
+                    elif target_unit_nickname == "Metric":  # native rain in cm
+                        threshold = 0.025
+                    sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
+                                 'CAST(COUNT(sum) AS FLOAT) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) ' \
+                                 'as obs ' \
+                                 'FROM archive_day_{2} ' \
+                                 'WHERE sum >0.01 AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                        strformat,
+                        xAxis_groupby,
+                        obs_lookup,
+                        start_ts,
+                        end_ts,
+                        order_sql
+                    )
+                    #  duck upcoming unit conversion - series is not a station observation
+                    obs_lookup = ""
+                # introduce meancountfrost aggregation type (number of times observed)
+                # Used for frost days.
+                elif aggregate_type == "meancountfrost":
+                    threshold = 0
+                    if target_unit_nickname == "US":  # update threshold if the database temp stored in degree_F
+                        threshold = 32
+                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
+                                 'CAST(COUNT(CASE WHEN min <= {0} THEN 1 END) AS FLOAT) / ' \
+                                 'COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%%m%%Y")) as obs ' \
+                                 'FROM archive_day_outTemp WHERE dateTime >= {1} AND dateTime <= {2} ' \
+                                 'GROUP BY month;'.format(
+                        threshold,
+                        start_ts,
+                        end_ts
+                    )
                 # Use daily summaries where possible
                 if (aggregate_interval >= 86400 and aggregate_interval % 86400 == 0) :  # 1 or more exact days
                     # Avg is a special case
