@@ -802,7 +802,7 @@ class getData(SearchList):
 
             # Why does this one require .format() but the other's don't?
             # dateTime >= 1583020800 <- 1ST MARCH = 1ST FULL MONTH AFTER RADIATION SENSOR INSTALLED
-            at_cloudiest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
+            at_cloudiest_month_sql = 'SELECT strftime("%m", datetime(dateTime, "unixepoch")) as month, ' \
                                      'strftime("%Y", datetime(dateTime, "unixepoch")) as year, ' \
                                      'ROUND( SUM( sum ), 2 ) AS total ' \
                                      'FROM archive_day_sunshine WHERE dateTime >= 1583020800 ' \
