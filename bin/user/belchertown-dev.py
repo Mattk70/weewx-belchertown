@@ -780,14 +780,14 @@ class getData(SearchList):
         database_type = self.generator.config_dict["Databases"][database]["database_type"]
         driver = self.generator.config_dict["DatabaseTypes"][database_type]["driver"]
         if driver == "weedb.sqlite":
-            year_sunniest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
+            year_sunniest_month_sql = 'SELECT strftime("%m", datetime(dateTime, "unixepoch")) as month, ' \
                                       'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_sunshine ' \
                                       'WHERE strftime("%Y", datetime(dateTime, "unixepoch")) = "{0}" ' \
                                       'GROUP BY month ORDER BY total DESC LIMIT 1;'.format(
                                         time.strftime("%Y", time.localtime(time.time()))
                                         )
             # Why does this one require .format() but the other's don't?
-            at_sunniest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
+            at_sunniest_month_sql = 'SELECT strftime("%m", datetime(dateTime, "unixepoch")) as month, ' \
                                     'strftime("%Y", datetime(dateTime, "unixepoch")) as year, ' \
                                     ' ROUND( SUM( sum ), 2 ) AS total ' \
                                     'FROM archive_day_sunshine GROUP BY month, year ORDER BY total DESC LIMIT 1;'
