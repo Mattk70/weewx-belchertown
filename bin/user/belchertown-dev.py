@@ -806,9 +806,8 @@ class getData(SearchList):
                                      'strftime("%Y", datetime(dateTime, "unixepoch")) as year, ' \
                                      'ROUND( SUM( sum ), 2 ) AS total ' \
                                      'FROM archive_day_sunshine WHERE dateTime >= 1583020800 ' \
-                                     'AND strftime("%Y%m%d", datetime(dateTime, "unixepoch")) < {0} ' \
-                                     'GROUP BY month, year ORDER BY total ASC LIMIT 1;'.format(
-                                           time.strftime("%Y%m01", time.localtime(time.time())))
+                                     'GROUP BY month, year ORDER BY total ASC LIMIT 1;'
+                                  #       .format(time.strftime("%Y%m01", time.localtime(time.time())))
             logerr(at_sunniest_month_sql)
             logerr(at_cloudiest_month_sql)
             year_rainiest_month_sql = (
