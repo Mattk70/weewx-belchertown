@@ -809,7 +809,7 @@ class getData(SearchList):
                                      'AND strftime("%%Y%%m%%d", datetime(dateTime, "unixepoch")) < {0} ' \
                                      'GROUP BY month, year ORDER BY total ASC LIMIT 1;'.format(
                                            time.strftime("%Y%m01", time.localtime(time.time())))
-
+            logerr(at_cloudiest_month_sql)
             year_rainiest_month_sql = (
                                         'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, '
                                         'ROUND( SUM( sum ), 2 ) as total FROM archive_day_rain '
