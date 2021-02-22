@@ -3711,7 +3711,8 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     elif target_unit_nickname == "Metric":  # native rain in cm
                         threshold = 0.025
                     sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
-                                 'CAST(COUNT(sum) AS FLOAT) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) ' \
+                                 'CAST(COUNT(sum) AS FLOAT) / ' \
+                                 'COUNT(DISTINCT strftime("%{0}%%Y", datetime(dateTime, "unixepoch", "localtime")))' \
                                  'as obs ' \
                                  'FROM archive_day_{2} ' \
                                  'WHERE sum >0.01 AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
@@ -3730,9 +3731,9 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     threshold = 0
                     if target_unit_nickname == "US":  # update threshold if the database temp stored in degree_F
                         threshold = 32
-                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
+                    sql_lookup = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch", "localtime")) as month, ' \
                                  'CAST(COUNT(CASE WHEN min <= {0} THEN 1 END) AS FLOAT) / ' \
-                                 'COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%%m%%Y")) as obs ' \
+                                 'COUNT(DISTINCT strftime("%%m%%Y", datetime(dateTime, "unixepoch", "localtime"))) as obs ' \
                                  'FROM archive_day_outTemp WHERE dateTime >= {1} AND dateTime <= {2} ' \
                                  'GROUP BY month;'.format(
                         threshold,
