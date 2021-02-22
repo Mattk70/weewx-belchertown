@@ -799,7 +799,7 @@ class getData(SearchList):
                                        'GROUP BY month ORDER BY total ASC LIMIT 1;'.format(
                                        time.strftime("%Y", time.localtime(time.time())),
                                        time.strftime("%Y%m01", time.localtime(time.time())))
-
+            logerr(year_cloudiest_month_sql)
             # Why does this one require .format() but the other's don't?
             # dateTime >= 1583020800 <- 1ST MARCH = 1ST FULL MONTH AFTER RADIATION SENSOR INSTALLED
             at_cloudiest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
