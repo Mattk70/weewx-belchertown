@@ -817,7 +817,7 @@ class getData(SearchList):
                                         'GROUP BY month ORDER BY total DESC LIMIT 1;'
                                         % time.strftime("%Y", time.localtime(time.time()))
                                         )
-            at_rainiest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
+            at_rainiest_month_sql = 'SELECT strftime("%m", datetime(dateTime, "unixepoch")) as month, ' \
                                     'strftime("%Y", datetime(dateTime, "unixepoch")) as year, ' \
                                     'ROUND( SUM( sum ), 2 ) as total ' \
                                     'FROM archive_day_rain ' \
