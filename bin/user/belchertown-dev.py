@@ -3678,9 +3678,11 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 # Useful for climate values e.g. Rain or sunshine hours average in a month
                 elif aggregate_type == "meansum":
                     sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
-                                 'SUM(sum) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) as obs ' \
-                                 'FROM archive_day_{2} ' \
-                                 'WHERE min IS NOT NULL AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                                 'SUM(sum) / ' \
+                                 'COUNT(DISTINCT strftime("%{0}%%Y", datetime(dateTime, "unixepoch", "localtime"))) ' \
+                                 'as obs FROM archive_day_{2} ' \
+                                 'WHERE min IS NOT NULL AND dateTime >= {3} ' \
+                                 'AND dateTime <= {4} GROUP BY {1}{5};'.format(
                         strformat,
                         xAxis_groupby,
                         obs_lookup,
