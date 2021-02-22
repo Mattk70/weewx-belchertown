@@ -3740,7 +3740,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                         end_ts
                     )
                 # Use daily summaries where possible
-                if (aggregate_interval >= 86400 and aggregate_interval % 86400 == 0) :  # 1 or more exact days
+                elif (aggregate_interval >= 86400 and aggregate_interval % 86400 == 0) :  # 1 or more exact days
                     # Avg is a special case
                     if aggregate_type == "avg":
                         sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) AS {1}, ' \
