@@ -780,44 +780,42 @@ class getData(SearchList):
         database_type = self.generator.config_dict["Databases"][database]["database_type"]
         driver = self.generator.config_dict["DatabaseTypes"][database_type]["driver"]
         if driver == "weedb.sqlite":
-            year_sunniest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
+            year_sunniest_month_sql = 'SELECT strftime("%m", datetime(dateTime, "unixepoch")) as month, ' \
                                       'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_sunshine ' \
-                                      'WHERE strftime("%Y", datetime(dateTime, "unixepoch")) = "%s" ' \
+                                      'WHERE strftime("%Y", datetime(dateTime, "unixepoch")) = "{0}" ' \
                                       'GROUP BY month ORDER BY total DESC LIMIT 1;'.format(
                                         time.strftime("%Y", time.localtime(time.time()))
                                         )
             # Why does this one require .format() but the other's don't?
-            at_sunniest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
+            at_sunniest_month_sql = 'SELECT strftime("%m", datetime(dateTime, "unixepoch")) as month, ' \
                                     'strftime("%Y", datetime(dateTime, "unixepoch")) as year, ' \
-                                    ' ROUND( SUM( sum ), 2 ) AS total ' \
+                                    'ROUND( SUM( sum ), 2 ) AS total ' \
                                     'FROM archive_day_sunshine GROUP BY month, year ORDER BY total DESC LIMIT 1;'
-            year_cloudiest_month_sql = (
-                                           'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, '
-                                           'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_sunshine '
-                                           'WHERE strftime("%sY", datetime(dateTime, "unixepoch")) = "%s" '
-                                           'AND dateTime >= 1583020800 '
-                                           'AND (strftime("%Y%%m%%d", datetime(dateTime, "unixepoch")) < "%s" '
-                                           'GROUP BY month ORDER BY total ASC LIMIT 1;'
-                                           % time.strftime("%%m%Y-01", time.localtime(time.time())),
-                                           time.strftime("%Y", time.localtime(time.time()))
-                                        )
+            year_cloudiest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
+                                       'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_sunshine ' \
+                                       'WHERE strftime("%Y", datetime(dateTime, "unixepoch")) = "{0}" ' \
+                                       'AND dateTime >= 1583020800 ' \
+                                       'AND strftime("%Y%m%d", datetime(dateTime, "unixepoch")) < {1} ' \
+                                       'GROUP BY month ORDER BY total ASC LIMIT 1;'.format(
+                                       time.strftime("%Y", time.localtime(time.time())),
+                                       time.strftime("%Y%m01", time.localtime(time.time())))
+
             # Why does this one require .format() but the other's don't?
             # dateTime >= 1583020800 <- 1ST MARCH = 1ST FULL MONTH AFTER RADIATION SENSOR INSTALLED
-            at_cloudiest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
+            at_cloudiest_month_sql = 'SELECT strftime("%m", datetime(dateTime, "unixepoch")) as month, ' \
                                      'strftime("%Y", datetime(dateTime, "unixepoch")) as year, ' \
                                      'ROUND( SUM( sum ), 2 ) AS total ' \
                                      'FROM archive_day_sunshine WHERE dateTime >= 1583020800 ' \
-                                     'AND (strftime("%Y-%%m", datetime(dateTime, "unixepoch")) ' \
-                                     '< DATE_FORMAT(NOW(), "%%Y-%%m-01") ) ' \
                                      'GROUP BY month, year ORDER BY total ASC LIMIT 1;'
+                                  #       .format(time.strftime("%Y%m01", time.localtime(time.time())))
             year_rainiest_month_sql = (
                                         'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, '
                                         'ROUND( SUM( sum ), 2 ) as total FROM archive_day_rain '
-                                        'WHERE strftime("%Y", datetime(dateTime, "unixepoch")) = "%s" '
+                                        'WHERE strftime("%%Y", datetime(dateTime, "unixepoch")) = "%s" '
                                         'GROUP BY month ORDER BY total DESC LIMIT 1;'
                                         % time.strftime("%Y", time.localtime(time.time()))
                                         )
-            at_rainiest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
+            at_rainiest_month_sql = 'SELECT strftime("%m", datetime(dateTime, "unixepoch")) as month, ' \
                                     'strftime("%Y", datetime(dateTime, "unixepoch")) as year, ' \
                                     'ROUND( SUM( sum ), 2 ) as total ' \
                                     'FROM archive_day_rain ' \
@@ -839,7 +837,7 @@ class getData(SearchList):
                                       'WHERE year( FROM_UNIXTIME( dateTime ) ) = "{0}" ' \
                                       'GROUP BY month ORDER BY total DESC LIMIT 1;'.format(
                 time.strftime("%Y", time.localtime(
-                    time.time())))  # Why does this one require .format() but the other's don't?
+                    time.time())))  # Why does this one require .format() but the others don't?
             at_sunniest_month_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
                                     'FROM_UNIXTIME( dateTime, "%%Y" ) AS year, ROUND( SUM( sum ), 2 ) AS total ' \
                                     'FROM archive_day_sunshine GROUP BY month, year ORDER BY total DESC LIMIT 1;'
@@ -849,8 +847,7 @@ class getData(SearchList):
                                        'AND dateTime >= 1583020800 ' \
                                        'AND (FROM_UNIXTIME(dateTime) < DATE_FORMAT(NOW(), "%%Y-%%m-01") ) ' \
                                        'GROUP BY month ORDER BY total ASC LIMIT 1;'.format(
-                time.strftime("%Y", time.localtime(
-                    time.time())))
+                                        time.strftime("%Y", time.localtime(time.time())))
             # Why does this one require .format() but the other's don't?
             # dateTime >= 1583020800 <- 1ST MARCH = 1ST FULL MONTH AFTER RADIATION SENSOR INSTALLED
             at_cloudiest_month_sql = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
@@ -923,7 +920,6 @@ class getData(SearchList):
                 year_cloudiest_month_name = calendar.month_name[int(year_cloudiest_month_query[0])]
             year_cloudiest_month = [year_cloudiest_month_name,
                                     locale.format("%g", float(year_cloudiest_month_converted))]
-            # logerr("cloudiest month: %s" % year_cloudiest_month) 
 
         else:
             year_cloudiest_month = ["N/A", 0.0]
@@ -3682,9 +3678,11 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 # Useful for climate values e.g. Rain or sunshine hours average in a month
                 elif aggregate_type == "meansum":
                     sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
-                                 'SUM(sum) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) as obs ' \
-                                 'FROM archive_day_{2} ' \
-                                 'WHERE min IS NOT NULL AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
+                                 'SUM(sum) / ' \
+                                 'COUNT(DISTINCT strftime("%{0}%%Y", datetime(dateTime, "unixepoch", "localtime"))) ' \
+                                 'as obs FROM archive_day_{2} ' \
+                                 'WHERE min IS NOT NULL AND dateTime >= {3} ' \
+                                 'AND dateTime <= {4} GROUP BY {1}{5};'.format(
                         strformat,
                         xAxis_groupby,
                         obs_lookup,
@@ -3715,7 +3713,8 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     elif target_unit_nickname == "Metric":  # native rain in cm
                         threshold = 0.025
                     sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
-                                 'CAST(COUNT(sum) AS FLOAT) / COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%{0}%%Y")) ' \
+                                 'CAST(COUNT(sum) AS FLOAT) / ' \
+                                 'COUNT(DISTINCT strftime("%{0}%%Y", datetime(dateTime, "unixepoch", "localtime")))' \
                                  'as obs ' \
                                  'FROM archive_day_{2} ' \
                                  'WHERE sum >0.01 AND dateTime >= {3} AND dateTime <= {4} GROUP BY {1}{5};'.format(
@@ -3734,9 +3733,9 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     threshold = 0
                     if target_unit_nickname == "US":  # update threshold if the database temp stored in degree_F
                         threshold = 32
-                    sql_lookup = 'SELECT FROM_UNIXTIME( dateTime, "%%m" ) AS month, ' \
+                    sql_lookup = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch", "localtime")) as month, ' \
                                  'CAST(COUNT(CASE WHEN min <= {0} THEN 1 END) AS FLOAT) / ' \
-                                 'COUNT(DISTINCT FROM_UNIXTIME( dateTime, "%%m%%Y")) as obs ' \
+                                 'COUNT(DISTINCT strftime("%%m%%Y", datetime(dateTime, "unixepoch", "localtime"))) as obs ' \
                                  'FROM archive_day_outTemp WHERE dateTime >= {1} AND dateTime <= {2} ' \
                                  'GROUP BY month;'.format(
                         threshold,
@@ -3744,7 +3743,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                         end_ts
                     )
                 # Use daily summaries where possible
-                if (aggregate_interval >= 86400 and aggregate_interval % 86400 == 0) :  # 1 or more exact days
+                elif (aggregate_interval >= 86400 and aggregate_interval % 86400 == 0) :  # 1 or more exact days
                     # Avg is a special case
                     if aggregate_type == "avg":
                         sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) AS {1}, ' \
@@ -3774,7 +3773,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 else:
                     sql_lookup = 'SELECT strftime("{0}", datetime(dateTime, "unixepoch", "localtime")) as {1}, ' \
                              'IFNULL({2}({3}),0) as obs, dateTime FROM archive ' \
-                             'WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6}{7}};'.format(
+                             'WHERE dateTime >= {4} AND dateTime <= {5} GROUP BY {6}{7};'.format(
                         strformat,
                         xAxis_groupby,
                         aggregate_type,
@@ -3941,6 +3940,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 obs_unit_from_target_unit = None
 
             query = archive.genSql(sql_lookup)
+            logerr(sql_lookup)
             for row in query:
                 xAxis_labels.append(row[0])
                 row_tuple = (row[1], obs_unit_from_target_unit, obs_group)
