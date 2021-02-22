@@ -789,7 +789,7 @@ class getData(SearchList):
             # Why does this one require .format() but the other's don't?
             at_sunniest_month_sql = 'SELECT strftime("%m", datetime(dateTime, "unixepoch")) as month, ' \
                                     'strftime("%Y", datetime(dateTime, "unixepoch")) as year, ' \
-                                    ' ROUND( SUM( sum ), 2 ) AS total ' \
+                                    'ROUND( SUM( sum ), 2 ) AS total ' \
                                     'FROM archive_day_sunshine GROUP BY month, year ORDER BY total DESC LIMIT 1;'
             year_cloudiest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
                                        'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_sunshine ' \
@@ -930,6 +930,7 @@ class getData(SearchList):
 
         # All time cloudiest month
         at_cloudiest_month_query = wx_manager.getSql(at_cloudiest_month_sql)
+        logerr(at_cloudiest_month_query)
         at_cloudiest_month_tuple = (at_cloudiest_month_query[2], sunshine_unit, 'group_time')
         at_cloudiest_month_converted = at_cloudiest_month_tuple[0]
         # t_cloudiest_month_converted = sunshine_round % self.generator.converter.convert(at_cloudiest_month_tuple)[0]
