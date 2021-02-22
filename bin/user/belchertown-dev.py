@@ -782,7 +782,7 @@ class getData(SearchList):
         if driver == "weedb.sqlite":
             year_sunniest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
                                       'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_sunshine ' \
-                                      'WHERE strftime("%%Y", datetime(dateTime, "unixepoch")) = "%s" ' \
+                                      'WHERE strftime("%Y", datetime(dateTime, "unixepoch")) = "%s" ' \
                                       'GROUP BY month ORDER BY total DESC LIMIT 1;'.format(
                                         time.strftime("%Y", time.localtime(time.time()))
                                         )
@@ -791,30 +791,33 @@ class getData(SearchList):
                                     'strftime("%Y", datetime(dateTime, "unixepoch")) as year, ' \
                                     ' ROUND( SUM( sum ), 2 ) AS total ' \
                                     'FROM archive_day_sunshine GROUP BY month, year ORDER BY total DESC LIMIT 1;'
-            year_cloudiest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, '
-                                       'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_sunshine '
-                                       'WHERE strftime("%%Y", datetime(dateTime, "unixepoch")) = "%s" '
-                                       'AND dateTime >= 1583020800 '
-                                       'AND (strftime("%m", datetime(dateTime, "unixepoch") < DATE_FORMAT(NOW(), "%%Y-%%m-01") ) '
-                                       'GROUP BY month ORDER BY total ASC LIMIT 1;'
-                                       % time.strftime("%Y", time.localtime(time.time()))
+            year_cloudiest_month_sql = (
+                                           'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, '
+                                           'ROUND( SUM( sum ), 2 ) AS total FROM archive_day_sunshine '
+                                           'WHERE strftime("%sY", datetime(dateTime, "unixepoch")) = "%s" '
+                                           'AND dateTime >= 1583020800 '
+                                           'AND (strftime("%Y%%m%%d", datetime(dateTime, "unixepoch")) < "%s" '
+                                           'GROUP BY month ORDER BY total ASC LIMIT 1;'
+                                           % time.strftime("%%m%Y-01", time.localtime(time.time())),
+                                           time.strftime("%Y", time.localtime(time.time()))
+                                        )
             # Why does this one require .format() but the other's don't?
             # dateTime >= 1583020800 <- 1ST MARCH = 1ST FULL MONTH AFTER RADIATION SENSOR INSTALLED
-            at_cloudiest_month_sql = 'SELECT strftime("%m", datetime(dateTime, "unixepoch")) as month, ' \
+            at_cloudiest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
                                      'strftime("%Y", datetime(dateTime, "unixepoch")) as year, ' \
                                      'ROUND( SUM( sum ), 2 ) AS total ' \
                                      'FROM archive_day_sunshine WHERE dateTime >= 1583020800 ' \
-                                     'AND (strftime("%m", datetime(dateTime, "unixepoch")) ' \
+                                     'AND (strftime("%Y-%%m", datetime(dateTime, "unixepoch")) ' \
                                      '< DATE_FORMAT(NOW(), "%%Y-%%m-01") ) ' \
                                      'GROUP BY month, year ORDER BY total ASC LIMIT 1;'
             year_rainiest_month_sql = (
                                         'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, '
                                         'ROUND( SUM( sum ), 2 ) as total FROM archive_day_rain '
-                                        'WHERE strftime("%%Y", datetime(dateTime, "unixepoch")) = "%s" '
+                                        'WHERE strftime("%Y", datetime(dateTime, "unixepoch")) = "%s" '
                                         'GROUP BY month ORDER BY total DESC LIMIT 1;'
                                         % time.strftime("%Y", time.localtime(time.time()))
                                         )
-            at_rainiest_month_sql = 'SELECT strftime("%m", datetime(dateTime, "unixepoch")) as month, ' \
+            at_rainiest_month_sql = 'SELECT strftime("%%m", datetime(dateTime, "unixepoch")) as month, ' \
                                     'strftime("%Y", datetime(dateTime, "unixepoch")) as year, ' \
                                     'ROUND( SUM( sum ), 2 ) as total ' \
                                     'FROM archive_day_rain ' \
