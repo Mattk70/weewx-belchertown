@@ -2671,7 +2671,7 @@ function showChart(json_file, prepend_renderTo=false) {
                 var range_max = Math.max(...maximum_flattened);
                 
                 var yAxis_tickInterval = Math.ceil( Math.round(range_max / 5) / 5 ) * 5; // Divide max outTemp by 5 and round it, then round that value up to the nearest 5th multiple. This gives clean yAxis tick lines. 
-                yAxis_label = polar ? "" :options.series[arrayNum].yAxis_label ;
+                //yAxis_label = polar ? "" :options.series[arrayNum].yAxis_label ;
                 options.plotOptions.bubble.marker.fillOpacity = polar ? 0.1 : 0.3;
                 options.yAxis = {
                     showFirstLabel: true,
