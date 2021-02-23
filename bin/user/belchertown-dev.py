@@ -2919,6 +2919,12 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                         # xAxis groupby section containing labels. Need to
                         # repack data, and update xAxis_categories.
 
+                        # Is it a Bubble chart? Then we'll have keys
+                        if "keys" in series_data:
+                            output[chart_group][plotname]["series"][line_name][
+                                "keys"
+                            ] = series_data["keys"]
+
                         # Use SQL Labels?
                         if "use_sql_labels" in series_data:
                             if series_data["use_sql_labels"]:
@@ -2933,7 +2939,8 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                                 "range_unit_label"
                             ] = series_data["range_unit_label"]
 
-                        # No matter what, reset data back to just the series
+
+                        # Reset data back to just the series
                         # data and not a dict of values
                         output[chart_group][plotname]["series"][line_name][
                             "data"
