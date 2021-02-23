@@ -3451,7 +3451,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
 
             return data
 
-            # Matt's Belchertown Bubble for Rain
+            # Matt's Belchertown-dev Bubble for Rain
             # https://www.highcharts.com/demo/bubble
             # https://www.visualisingdata.com/2014/02/weather-radials-new-project-from-raureif/
         if observation == "bubble":
