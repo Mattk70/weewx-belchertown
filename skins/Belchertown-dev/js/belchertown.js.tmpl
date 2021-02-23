@@ -2743,8 +2743,9 @@ function showChart(json_file, prepend_renderTo=false) {
                             highcharts_tooltip_factory( point.point.low, observation_type, true, rounding, mirrored, numberFormat ) +
                             "<br><span style='color:" + get_outTemp_color( point.series.userOptions.obsUnit, point.point.average, true) +
                              "'>\u25CF</span> $obs.label.average_temperature: " +
-                             highcharts_tooltip_factory( point.point.average, observation_type, true, rounding, mirrored, numberFormat )
-				: ["<br><span style='color:" + get_outTemp_color( series[0].userOptions.obsUnit, series[0].z, true) + "'>\u25CF</span> $obs.label.rain: " + highcharts_tooltip_factory( series[0].z, observation_type, true, 2, 0 , "" )]) }
+                             highcharts_tooltip_factory( point.point.average, observation_type, true, rounding, mirrored, numberFormat ) +
+				            "<br><span style='color:" + get_outTemp_color( series[0].userOptions.obsUnit, series[0].z, true) +
+				            "'>\u25CF</span> $obs.label.rain: " + highcharts_tooltip_factory( series[0].z, observation_type, true, 2, 0 , "" )) }
                     }
                 }
 
