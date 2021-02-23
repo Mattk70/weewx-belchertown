@@ -3505,7 +3505,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             time_ms = [float(x) * 1000 for x in time_start_vt[0]]
             output_data = zip(time_ms, avg_obs_vt[0], sum_obs_vt[0])
 
-            data = {"bubble": True, "obsdata": output_data, "range_unit": obs_unit, "range_unit_label": obs_unit_label}
+            data = {"bubble": True, "keys": ['x', 'y', 'z'], "obsdata": output_data, "range_unit": obs_unit, "range_unit_label": obs_unit_label}
 
             return data
 
