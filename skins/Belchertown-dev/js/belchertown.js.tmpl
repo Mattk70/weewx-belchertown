@@ -1067,7 +1067,6 @@ function aeris_icon( data ) {
         "mcloudyw": "mostly-cloudy-day",
         "mcloudywn": "mostly-cloudy-night",
         "na": "unknown",
-        "na": "unknown",
         "pcloudy": "partly-cloudy-day",
         "pcloudyn": "partly-cloudy-night",
         "pcloudyr": "rain",
@@ -1094,7 +1093,6 @@ function aeris_icon( data ) {
         "rainandsnown": "rain",
         "raintosnow": "rain",
         "raintosnown": "rain",
-        "rainw": "rain",
         "rainw": "rain",
         "showers": "rain",
         "showersn": "rain",
@@ -1126,7 +1124,6 @@ function aeris_icon( data ) {
         "tstormsn": "thunderstorm",
         "tstormsw": "thunderstorm",
         "tstormswn": "thunderstorm",
-        "wind": "wind",
         "wind": "wind",
         "wintrymix": "sleet",
         "wintrymixn": "sleet"
@@ -2017,7 +2014,61 @@ function showChart(json_file, prepend_renderTo=false) {
                 	    }
             	    }
                 },
-                exporting: {
+               exporting: {
+                    chartOptions: {
+                        chart: {
+                            events: {
+                                load: function() {
+                                    this.title.update({style: {color: '#e5554e'}});
+
+                                    if (sessionStorage.getItem('currentTheme') === 'dark') {
+                                        var darktheme_textcolor = '#fff';
+                                        for (var i = this.yAxis.length - 1; i >= 0; i--) {
+                                            this.yAxis[i].update({
+                                                title: {style: {color: darktheme_textcolor}},
+                                                labels: {style: {color: darktheme_textcolor}},
+                                                gridLineColor: '#707073',
+                                                tickColor: '#707073'
+                                            });
+                                        }
+
+                                        for (var i = this.xAxis.length - 1; i >= 0; i--) {
+                                            this.xAxis[i].update({
+                                                title: {style: {color: darktheme_textcolor}},
+                                                labels: {style: {color: darktheme_textcolor}},
+                                                gridLineColor: '#707073',
+                                                tickColor: '#707073'
+                                            });
+                                        }
+
+                                        this.legend.update({itemStyle: {color: darktheme_textcolor}});
+
+                                        //this.credits.update({style:{color: darktheme_textcolor}});
+
+                                        this.subtitle.update({style: {color: darktheme_textcolor}});
+
+                                        this.chartBackground.attr({fill: jQuery(".highcharts-background").css("fill")});
+                                    } else {
+                                        var lighttheme_textcolor = '#666666';
+                                        for (var i = this.yAxis.length - 1; i >= 0; i--) {
+                                            this.yAxis[i].update({
+                                                title: {style: {color: lighttheme_textcolor}},
+                                                labels: {style: {color: lighttheme_textcolor}},
+                                            });
+                                        }
+
+                                        for (var i = this.xAxis.length - 1; i >= 0; i--) {
+                                            this.xAxis[i].update({
+                                                title: {style: {color: lighttheme_textcolor}},
+                                                labels: {style: {color: lighttheme_textcolor}},
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+
                     enabled: JSON.parse( String( exporting_enabled ) ) // Convert string to bool
                 },
 
@@ -2647,11 +2698,7 @@ function showChart(json_file, prepend_renderTo=false) {
             if (observation_type == "weatherRange") {
                 options.chart.type = "columnrange";
                 // If polar is defined, use it and add a special dark mode CSS class
-                // For now, weatherRange must be the last plot in the chart definition so this works:
-                var arrayNum = options.series.length -1;
-		        var polar = false;
-                if ( JSON.parse( String( options.series[arrayNum].polar.toLowerCase() ) ) ) {
-		            polar = true;
+                if ( JSON.parse( String( options.series[0].polar.toLowerCase() ) ) ) {
                     options.chart.polar = true; // Make sure the option is a string, then convert to bool
                     options.chart.className = "highcharts-weatherRange belchertown-polar"; // Used for dark mode
                 } else {
@@ -2663,11 +2710,11 @@ function showChart(json_file, prepend_renderTo=false) {
                 // Find min and max of the series data for the yAxis min and max
                 var minimum_flattened = [];
                 var maximum_flattened = [];
-                options.series[arrayNum].data.forEach( seriesData => {
+                options.series[0].data.forEach( seriesData => {
                     minimum_flattened.push(seriesData[1]);
                     maximum_flattened.push(seriesData[2]);
                 });
-                var range_min = polar ? -20 : Math.min(...minimum_flattened);
+                var range_min = Math.min(...minimum_flattened);
                 var range_max = Math.max(...maximum_flattened);
                 
                 var yAxis_tickInterval = Math.ceil( Math.round(range_max / 5) / 5 ) * 5; // Divide max outTemp by 5 and round it, then round that value up to the nearest 5th multiple. This gives clean yAxis tick lines. 
@@ -2718,12 +2765,12 @@ function showChart(json_file, prepend_renderTo=false) {
                 }
                 // Update data
                 var currentSeries = options.series;
-                var currentSeriesData = options.series[arrayNum].data;
-                var range_unit = options.series[arrayNum].range_unit;
+                var currentSeriesData = options.series[0].data;
+                var range_unit = options.series[0].range_unit;
                 var newSeriesData = [];
                 currentSeriesData.forEach( seriesData => {
-                    if ( options.series[arrayNum].color ) {
-                        var color = options.series[arrayNum].color;
+                    if ( options.series[0].color ) {
+                        var color = options.series[0].color;
                     } else {
                         // Set color of the column based on the average temperature, or return default if not temperature
                         var color = get_outTemp_color( range_unit, seriesData[3], true );                    
