@@ -2671,75 +2671,51 @@ function showChart(json_file, prepend_renderTo=false) {
                 var range_max = Math.max(...maximum_flattened);
                 
                 var yAxis_tickInterval = Math.ceil( Math.round(range_max / 5) / 5 ) * 5; // Divide max outTemp by 5 and round it, then round that value up to the nearest 5th multiple. This gives clean yAxis tick lines. 
-                //yAxis_label = polar ? "" :options.series[arrayNum].yAxis_label ;
-                options.plotOptions.bubble.marker.fillOpacity = polar ? 0.1 : 0.3;
-                options.yAxis = {
+              options.yAxis = {
                     showFirstLabel: true,
                     tickInterval: yAxis_tickInterval,
-                    labels: {y: 3},
                     min: range_min,
                     max: range_max,
                     title: {
-                        text: yAxis_label,
+                        text: options.series[0].yAxis_label,
                     },
                 }
-                options.yAxis.gridLineDashStyle = polar ? "LongDashDot": "ShortDash";
-                options.yAxis.labels.x = polar ? 10:-2;
-                options.yAxis.labels.style = polar ? {'color': '#ccc', 'fontSize': '8px'}: {'color': '#999'};
 
-
-   		options.yAxis.labels.formatter = function () {
- 	               var label = this.axis.defaultLabelFormatter.call(this);
-       		       return this.value + "\u00B0C";
-       		      }
-                // options.xAxis = {}
-                options.xAxis.showLastLabel = true;
-                options.xAxis.labels = {
-                        format: "{value: %b}",
-			style: {color: "#999"}
-                    };
-                options.xAxis.tickInterval =  2592000000; // 30 days
-                options.xAxis.showLastLabel = true;
-                options.xAxis.gridLineWidth = 0;
-                options.xAxis.crosshair = true;
-                //
-                //options.xAxis = {
-                //    dateTimeLabelFormats: {
-                //        day: '%e %b',
-                //        week: '%e %b',
-                //        month: '%b %y',
-                //    },
-                //    showLastLabel: true,
-                //    crosshair: true,
-                //    type: "datetime"
-                //}
-
-
-                //options.plotOptions = {}
-                options.plotOptions.series = {
-                    turboThreshold: 0,
-                    stacking: "normal",
-                    showInLegend: false,
-                    borderWidth: 0,
+                options.xAxis = {
+                    dateTimeLabelFormats: {
+                        day: '%e %b',
+                        week: '%e %b',
+                        month: '%b %y',
+                    },
+                    showLastLabel: true,
+                    crosshair: true,
+                    type: "datetime"
                 }
-                // Add any annotations to the polar chart
-                var annotations = [];
+
+                options.plotOptions = {}
+                options.plotOptions = {
+                    series: {
+                        turboThreshold: 0,
+                        stacking: "normal",
+                        showInLegend: false,
+                        borderWidth: 0,
+                    }
+                }
+
                 options.tooltip = {
                     split: false,
                     shared: true,
                     followPointer: true,
                     useHTML: true,
-                    formatter: function (tooltip) {
-                        return ["<strong>" + moment.unix( this.x / 1000).utcOffset($moment_js_utc_offset).format( tooltip_date_format + "</string>" )].concat(this.points ? this.points.map(function (point) {
-                        //return this.points.map(function (point) {
+                    formatter: function(tooltip) {
+                        return this.points.map(function(point) {
                             var rounding = point.series.userOptions.rounding;
                             var mirrored = point.series.userOptions.mirrored_value;
                             var numberFormat = point.series.userOptions.numberFormat ? point.series.userOptions.numberFormat : "";
-                            return "<br><span style='color:" + get_outTemp_color( point.series.userOptions.obsUnit, point.point.high, true) +  "'>\u25CF</span> $obs.label.highest_temperature: " + highcharts_tooltip_factory( point.point.high, observation_type, true, rounding, mirrored, numberFormat ) + "<br><span style='color:" + get_outTemp_color( point.series.userOptions.obsUnit, point.point.low, true) +  "'>\u25CF</span> $obs.label.lowest_temperature: " + highcharts_tooltip_factory( point.point.low, observation_type, true, rounding, mirrored, numberFormat ) + "<br><span style='color:" + get_outTemp_color( point.series.userOptions.obsUnit, point.point.average, true) + "'>\u25CF</span> $obs.label.average_temperature: " + highcharts_tooltip_factory( point.point.average, observation_type, true, rounding, mirrored, numberFormat )})
-				: ["<br><span style='color:" + get_outTemp_color( this.series.userOptions.obsUnit, this.z, true) + "'>\u25CF</span> $obs.label.rain: " + highcharts_tooltip_factory( this.z, observation_type, true, 2, 0 , "" )])
+                            return "<strong>" + moment.unix(point.x / 1000).utcOffset($moment_js_utc_offset).format(tooltip_date_format) + "</strong><br><span style='color:" + get_outTemp_color(point.series.userOptions.obsUnit, point.point.high, true) + "'>\u25CF</span> $obs.label.highest_temperature: " + highcharts_tooltip_factory(point.point.high, observation_type, true, rounding, mirrored, numberFormat) + "<br><span style='color:" + get_outTemp_color(point.series.userOptions.obsUnit, point.point.low, true) + "'>\u25CF</span> $obs.label.lowest_temperature: " + highcharts_tooltip_factory(point.point.low, observation_type, true, rounding, mirrored, numberFormat) + "<br><span style='color:" + get_outTemp_color(point.series.userOptions.obsUnit, point.point.average, true) + "'>\u25CF</span> $obs.label.average_temperature: " + highcharts_tooltip_factory(point.point.average, observation_type, true, rounding, mirrored, numberFormat);
+                        });
                     }
                 }
-
                 // Update data
                 var currentSeries = options.series;
                 var currentSeriesData = options.series[arrayNum].data;
