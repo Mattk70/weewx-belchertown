@@ -2736,7 +2736,7 @@ function showChart(json_file, prepend_renderTo=false) {
                         color: color
                     });
                 });
-                delete options.series[arrayNum].data;
+                options.series = [];
                 options.series.push({
                     data: newSeriesData,
                     obsType: "weatherRange",
