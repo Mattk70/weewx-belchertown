@@ -2479,7 +2479,7 @@ function showChart(json_file, prepend_renderTo=false) {
                 options.tooltip.followPointer = true;
                 options.tooltip.useHTML = true;
                 
-                // Since wind rose is a special observation, I did not re-do the JSON arrays to accomodate it as a separate array.
+                // Since wind rose is a special observation, I did not re-do the JSON arrays to accommodate it as a separate array.
                 // So we need to grab the data array within the series and save it to a temporary array, delete the entire chart series, 
                 // and reapply the windrose data back to the series.
                 var newSeries = options.series[0].data;
@@ -2767,7 +2767,7 @@ function showChart(json_file, prepend_renderTo=false) {
                 // Update data
                 var currentSeries = options.series;
                 var currentSeriesData = options.series[0].data;
-                var range_unit = options.series.range_unit;
+                var range_unit = options.series[0].range_unit;
                 belchertown_debug("range unit is " + range_unit);
                 var newSeriesData = [];
                 currentSeriesData.forEach( seriesData => {
@@ -2785,7 +2785,7 @@ function showChart(json_file, prepend_renderTo=false) {
                         color: color
                     });
                 });
-                //options.series = [];
+                options.series = [];
                 options.series.push({
                     data: newSeriesData,
                     obsType: "weatherRange",
