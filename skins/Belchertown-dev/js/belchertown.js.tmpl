@@ -129,7 +129,7 @@ function getURLvar(k) {
     if (chart.series.name == "sunshine"){
         $.each(chart.series, function (series) {
 
-            if ($chart.series[series].name == "sunshine"){
+            if (chart.series[series].name == "sunshine"){
                 $.each(chart.series[series].data, function () {
                     if(this.y === 0 && this.graphic) {
                         this.graphic.hide();
