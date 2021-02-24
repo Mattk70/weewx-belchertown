@@ -2756,7 +2756,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     if observation_type == "rainTotal":
                         obs_label = "rain"
                     elif (
-                            observation_type == "weatherRange" or "bubble"
+                            observation_type == "weatherRange"
                             and weatherRange_obs_lookup is not None
                     ):
                         obs_label = weatherRange_obs_lookup
@@ -3380,7 +3380,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     "You are missing the range_type configuration item."
                 )
 
-            # Force 1 day if aggregate_interval. These charts are meant to show
+            # Force 1 day if no aggregate_interval. These charts are meant to show
             # a column range for high, low and average for a full day.
             if not aggregate_interval:
                 aggregate_interval = 86400

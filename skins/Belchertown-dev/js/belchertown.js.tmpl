@@ -2323,6 +2323,7 @@ function showChart(json_file, prepend_renderTo=false) {
             
             // Handle series specific data, overrides and non-Highcharts options that we passed through
             options.series.forEach(s => {
+                return if s.obsType == "weatherRange";
                 if (s.yAxis == "1") {
                     // If yAxis = 1 is set for the observation, add a new yAxis and associate that observation to the right side of the chart
                     yAxis1_active = true;
