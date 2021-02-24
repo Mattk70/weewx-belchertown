@@ -2222,7 +2222,8 @@ function showChart(json_file, prepend_renderTo=false) {
                                 belchertown_debug(`tooltip: x=\${this.point.x} y =  \${this.point.y}  z = \${this.point.z}`);
                                 return [moment.unix( this.x / 1000).utcOffset($moment_js_utc_offset).format( tooltip_date_format )].concat(
                                     // Catch anything else that might be a bubble plot. Bubble plots will just show x,y coordinates without this.
-                                    "<span style='color:" + this.series.color + "'>\u25CF</span> " + this.series.name + ': ' + Highcharts.numberFormat(this.point.z) + obs.label.rain                               )
+                                    "<span style='color:" + this.series.color + "'>\u25CF</span> " + this.series.name + ': ' + Highcharts.numberFormat(this.point.z)
+                                )
                             } else {
                                 return tooltip.defaultFormatter.call(this, tooltip);
                             }
