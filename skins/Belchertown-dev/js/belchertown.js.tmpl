@@ -128,11 +128,14 @@ function getURLvar(k) {
     belchertown_debug( "chart series name is " + chart.series.name);
     if (chart.series.name == "sunshine"){
         $.each(chart.series, function (series) {
-            $.each(chart.series[series].data, function () {
-                if(this.y === 0 && this.graphic) {
-                    this.graphic.hide();
-                }
-            });
+            belchertown_debug( "chart series name is " + chart.series[series].name);
+            if ($.chart.series[series].name == "sunshine"){
+                $.each(chart.series[series].data, function () {
+                    if(this.y === 0 && this.graphic) {
+                        this.graphic.hide();
+                    }
+                });
+            };
         });
     }
 };
