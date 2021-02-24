@@ -125,11 +125,8 @@ function getURLvar(k) {
 // Function to hide markers. Source https://stackoverflow.com/questions/20213443/disable-markers-if-data-1-in-highcharts
 // Used in Sunshine chart
  function hideZeroDots(chart) {
-
-
         $.each(chart.series, function (series) {
-            belchertown_debug( "chart series name is " + chart.series[series].name);
-            if (chart.series[series].name == "sunshine"){
+            if (chart.series[series].name.toLowerCase() == "sunshine"){
                 $.each(chart.series[series].data, function () {
                     if(this.y === 0 && this.graphic) {
                         this.graphic.hide();
