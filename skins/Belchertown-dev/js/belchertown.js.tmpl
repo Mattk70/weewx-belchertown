@@ -2697,7 +2697,7 @@ function showChart(json_file, prepend_renderTo=false) {
 
             // If weather range is present, configure a special chart to show that data
             // https://www.highcharts.com/blog/tutorials/209-the-art-of-the-chart-weather-radials/
-            if (options.chart.type == "weatherRange") {
+            if (options.chart.type == "columnrange") {
                 options.chart.type = "columnrange";
                 // If polar is defined, use it and add a special dark mode CSS class
                 if ( JSON.parse( String( options.series[0].polar.toLowerCase() ) ) ) {
