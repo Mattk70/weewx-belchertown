@@ -286,6 +286,10 @@ class getData(SearchList):
                                        calendar.timegm(moment_js_stop_struct)
                                        - calendar.timegm(time.gmtime(time.mktime(moment_js_stop_struct)))
                                ) / 60
+        try:
+            moment_js_tz = self.generator.skin_dict["Units"]["TimeZone"].get("time_zone")
+        except KeyError:
+            moment_js_tz = ""
 
         # Highcharts UTC offset is the opposite of normal. Positive values are
         # west, negative values are east of UTC.
@@ -2200,6 +2204,7 @@ class getData(SearchList):
             "belchertown_version": VERSION,
             "belchertown_debug": belchertown_debug,
             "moment_js_utc_offset": moment_js_utc_offset,
+            "moment_js_tz": moment_js_tz,
             "highcharts_timezoneoffset": highcharts_timezoneoffset,
             "system_locale": system_locale,
             "system_locale_js": system_locale_js,
