@@ -3955,7 +3955,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                 obs_group = None
                 obs_unit_from_target_unit = None
 
-            query = archive.genSql(sql_lookup)
+            query = db_manager.genSql(sql_lookup)
             for row in query:
                 xAxis_labels.append(row[0])
                 row_tuple = (row[1], obs_unit_from_target_unit, obs_group)
@@ -3986,9 +3986,10 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
 
         # Begin standard observation lookups
         try:
-            (time_start_vt, time_stop_vt, obs_vt) = archive.getSqlVectors(
-                TimeSpan(start_ts, end_ts),
+            (time_start_vt, time_stop_vt, obs_vt) = weewx.xtypes.get_series(
                 obs_lookup,
+                TimeSpan(start_ts, end_ts),
+                db_manager,
                 aggregate_type,
                 aggregate_interval,
             )
