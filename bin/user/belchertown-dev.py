@@ -29,6 +29,7 @@ import weewx.reportengine
 import weewx.station
 import weewx.tags
 import weewx.units
+import weewx.xtypes
 from weeutil.weeutil import (
     TimeSpan,
     archiveDaySpan,
@@ -2464,11 +2465,11 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     "data_binding",
                     self.config_dict["StdReport"].get("data_binding", "wx_binding"),
                 )
-                archive = self.db_binder.get_manager(binding)
+                db_manager = self.db_binder.get_manager(binding)
 
                 # Generate timespan for the string time windows
-                start_ts = archive.firstGoodStamp()
-                stop_ts = archive.lastGoodStamp()
+                start_ts = db_manager.firstGoodStamp()
+                stop_ts = db_manager.lastGoodStamp()
                 timespan = weeutil.weeutil.TimeSpan(start_ts, stop_ts)
 
                 # Find timestamps for the rolling window
@@ -2734,7 +2735,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     # Find if this chart is using a new database binding.
                     # Default to the binding set in plot_options
                     binding = line_options.get("data_binding", binding)
-                    archive = self.db_binder.get_manager(binding)
+                    db_manager = self.db_binder.get_manager(binding)
 
                     # Find the observation type if specified (e.g. more than 1
                     # of the same on a chart). (e.g. outTemp, rainFall,
@@ -2904,7 +2905,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                     # Build series data
                     series_data = self.get_observation_data(
                         binding,
-                        archive,
+                        db_manager,
                         observation_type,
                         minstamp,
                         maxstamp,
@@ -2973,7 +2974,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
     def get_observation_data(
             self,
             binding,
-            archive,
+            db_manager,
             observation,
             start_ts,
             end_ts,
@@ -3006,9 +3007,10 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
 
             # Get windDir observations.
             obs_lookup = "windDir"
-            (time_start_vt, time_stop_vt, windDir_vt) = archive.getSqlVectors(
-                TimeSpan(start_ts, end_ts),
+            (time_start_vt, time_stop_vt, windDir_vt) = weewx.xtypes.get_series(
                 obs_lookup,
+                TimeSpan(start_ts, end_ts),
+                db_manager,
                 aggregate_type,
                 aggregate_interval,
             )
@@ -3020,9 +3022,10 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
 
             # Get windSpeed observations.
             obs_lookup = "windSpeed"
-            (time_start_vt, time_stop_vt, windSpeed_vt) = archive.getSqlVectors(
-                TimeSpan(start_ts, end_ts),
+            (time_start_vt, time_stop_vt, windSpeed_vt) = weewx.xtypes.get_series(
                 obs_lookup,
+                TimeSpan(start_ts, end_ts),
+                db_manager,
                 aggregate_type,
                 aggregate_interval,
             )
@@ -3393,9 +3396,10 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             # Get min values
             aggregate_type = "min"
             try:
-                (time_start_vt, time_stop_vt, obs_vt) = archive.getSqlVectors(
-                    TimeSpan(start_ts, end_ts),
+                (time_start_vt, time_stop_vt, obs_vt) = weewx.xtypes.get_series(
                     obs_lookup,
+                    TimeSpan(start_ts, end_ts),
+                    db_manager,
                     aggregate_type,
                     aggregate_interval,
                 )
@@ -3410,9 +3414,10 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             # Get max values
             aggregate_type = "max"
             try:
-                (time_start_vt, time_stop_vt, obs_vt) = archive.getSqlVectors(
-                    TimeSpan(start_ts, end_ts),
+                (time_start_vt, time_stop_vt, obs_vt) = weewx.xtypes.get_series(
                     obs_lookup,
+                    TimeSpan(start_ts, end_ts),
+                    db_manager,
                     aggregate_type,
                     aggregate_interval,
                 )
@@ -3427,9 +3432,10 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             # Get avg values
             aggregate_type = "avg"
             try:
-                (time_start_vt, time_stop_vt, obs_vt) = archive.getSqlVectors(
-                    TimeSpan(start_ts, end_ts),
+                (time_start_vt, time_stop_vt, obs_vt) = weewx.xtypes.get_series(
                     obs_lookup,
+                    TimeSpan(start_ts, end_ts),
+                    db_manager,
                     aggregate_type,
                     aggregate_interval,
                 )
@@ -3477,11 +3483,12 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             # Get sum values
             aggregate_type = "sum"
             try:
-                (time_start_vt, time_stop_vt, obs_vt) = archive.getSqlVectors(
-                    TimeSpan(start_ts, end_ts),
+                (time_start_vt, time_stop_vt, obs_vt) = weewx.xtypes.get_series(
                     obs_lookup,
+                    TimeSpan(start_ts, end_ts),
+                    db_manager,
                     aggregate_type,
-                    aggregate_interval
+                    aggregate_interval,
                 )
             except Exception as e:
                 raise Warning("Error trying to use database binding %s to graph observation %s. Error was: %s." % (
@@ -3492,11 +3499,12 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             # Get avg values
             aggregate_type = "avg"
             try:
-                (time_start_vt, time_stop_vt, obs_vt) = archive.getSqlVectors(
+                (time_start_vt, time_stop_vt, obs_vt) = weewx.xtypes.get_series(
+                    obs_lookup,
                     TimeSpan(start_ts, end_ts),
-                    "outTemp",
+                    db_manager,
                     aggregate_type,
-                    aggregate_interval
+                    aggregate_interval,
                 )
             except Exception as e:
                 raise Warning("Error trying to use database binding %s to graph observation %s. Error was: %s." % (
@@ -3539,9 +3547,10 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             # Get min values
             obs_lookup = "windSpeed"
             try:
-                (time_start_vt, time_stop_vt, obs_vt) = archive.getSqlVectors(
-                    TimeSpan(start_ts, end_ts),
+                (time_start_vt, time_stop_vt, obs_vt) = weewx.xtypes.get_series(
                     obs_lookup,
+                    TimeSpan(start_ts, end_ts),
+                    db_manager,
                     aggregate_type,
                     aggregate_interval,
                 )
@@ -3556,9 +3565,10 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             # Get max values
             obs_lookup = "windGust"
             try:
-                (time_start_vt, time_stop_vt, obs_vt) = archive.getSqlVectors(
-                    TimeSpan(start_ts, end_ts),
+                (time_start_vt, time_stop_vt, obs_vt) = weewx.xtypes.get_series(
                     obs_lookup,
+                    TimeSpan(start_ts, end_ts),
+                    db_manager,
                     aggregate_type,
                     aggregate_interval,
                 )
