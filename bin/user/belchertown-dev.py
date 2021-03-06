@@ -106,6 +106,24 @@ aqi_category = ""
 aqi_time = 0
 aqi_location = ""
 
+class DailySummariesGroupBy(weewx.xtypes.DailySummaries):
+    """
+    Overrides ArchiveGroupTable and adds GROUP BY and optionally ORDER BY clauses to SQL statements
+    """
+
+    daily_sql_dict = weewx.xtypes.DailySummaries.daily_sql_dict.copy()
+
+    for v in daily_sql_dict.values():
+        v = v.replace(';',  ' GROUP BY %(xAxis_groupby)s %(order_sql)s;')
+
+    def get_aggregate(obs_type, timespan, aggregate_type, db_manager, **option_dict):
+        group_by = option_dict['group_by']
+        order = option_dict['order']
+        for value in daily_sql_dict.values():
+            value = value.replace(';',  ' GROUP BY ' + group_by + ' ' + order + ';')
+        return super().get_aggregate(obs_type, timespan, aggregate_type, db_manager, **option_dict)
+
+
 
 class getData(SearchList):
     """
@@ -291,7 +309,7 @@ class getData(SearchList):
             moment_js_tz = self.generator.skin_dict["Units"]["TimeZone"].get("time_zone")
         except KeyError:
             moment_js_tz = ""
-
+        logerr("moment_js_tz = " + moment_js_tz)
         # Highcharts UTC offset is the opposite of normal. Positive values are
         # west, negative values are east of UTC.
         # https://api.highcharts.com/highcharts/time.timezoneOffset Multiplying
