@@ -2830,7 +2830,7 @@ function showChart(json_file, prepend_renderTo=false) {
 
 };
 	function tzAdjustedMoment(input) {
-    let tz = "\$moment_js_tz";
+    let tz = "$time_zone";
     if (!tz) {
         return moment.unix(input).utcOffset($moment_js_utc_offset);
     } else {
