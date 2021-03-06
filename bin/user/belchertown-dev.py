@@ -309,7 +309,6 @@ class getData(SearchList):
             moment_js_tz = self.generator.skin_dict["Units"]["TimeZone"].get("time_zone")
         except KeyError:
             moment_js_tz = ""
-        logerr("moment_js_tz = " + moment_js_tz)
         # Highcharts UTC offset is the opposite of normal. Positive values are
         # west, negative values are east of UTC.
         # https://api.highcharts.com/highcharts/time.timezoneOffset Multiplying
